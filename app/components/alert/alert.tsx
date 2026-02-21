@@ -1,6 +1,7 @@
 export default function alert() {
+    const tileAlert = "Pene";
 
     return (
-        <div>Alert Component</div>
+        <div>Alert Component: {tileAlert}</div>
     );
 }
