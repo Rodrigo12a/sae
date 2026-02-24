@@ -1,24 +1,26 @@
-import Link from "next/link";
+import { AuthTabs } from "@/modules/auth/components/AuthTabs";
 import { LoginForm } from "@/modules/auth/components/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="w-full max-w-md space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl text-black font-semibold">Iniciar sesión</h1>
-        <p className="text-sm text-gray-500">Accede al sistema SAE</p>
-      </div>
+    <div className=" px-6 py-10 md:px-10">
+      <header className="text-center space-y-3 mb-8">
+        <div className="flex justify-center">
+          <img 
+            src="/iconos/isotipo-claro.png" 
+            alt="logo" 
+            className="w-28 h-28 object-contain mb-6" />
+        </div>
 
-      <LoginForm />
+        <h1 className="text-2xl font-semibold text-black">
+          Bienvenido al SAE
+        </h1>
 
-      <div className="flex justify-between text-sm">
-        <Link href="/forgot-password" className="text-blue-600 hover:underline">
-          ¿Olvidaste tu contraseña?
-        </Link>
-        <Link href="/register" className="text-blue-600 hover:underline">
-          Crear cuenta
-        </Link>
-      </div>
+        <p className="text-sm text-black">
+          Regístrate o inicia sesión a continuación para comenzar
+        </p>
+      </header>
+      <AuthTabs />
     </div>
   );
 }
