@@ -1,5 +1,4 @@
-import { AuthTabs } from "@/modules/auth/components/AuthTabs";
-import { LoginForm } from "@/modules/auth/components/LoginForm";
+import { AuthTabs } from "@/modules/auth/components";
 
 export default function LoginPage() {
   return (

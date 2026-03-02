@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 
 export function ForgotPasswordForm() {
@@ -8,7 +8,7 @@ export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await forgotPassword({ email });
     setSuccess(true);

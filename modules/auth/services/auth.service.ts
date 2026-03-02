@@ -1,10 +1,21 @@
-import { api } from "@/services/api";
-import { LoginDto, RegisterDto, ForgotPasswordDto } from "../../types";
+import { api } from "@/lib/api";
+import { LoginDto, RegisterDto, ForgotPasswordDto } from "../types";
+import { AxiosError } from "axios";
 
 export const authService = {
   login: async (data: LoginDto) => {
-    const response = await api.post("/auth/login", data);
-    return response.data;
+    try {
+      const response = await api.post("/auth/login", data);
+      return response.data;
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      const message =
+        axiosError.response?.data?.message ??
+        (axiosError.response?.status === 401
+          ? "Correo o contraseña incorrectos"
+          : "Error al iniciar sesión");
+      throw new Error(message);
+    }
   },
 
   register: async (data: RegisterDto) => {

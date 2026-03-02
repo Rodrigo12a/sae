@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { authService } from "../services/auth.service";
-import { LoginDto, RegisterDto, ForgotPasswordDto } from "../../types"
+import { authService } from "@/modules/auth/services/auth.service";
+import { LoginDto, RegisterDto, ForgotPasswordDto } from "../types";
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
