@@ -6,7 +6,7 @@ export default function LoginPage() {
       <header className="text-center space-y-3 mb-8">
         <div className="flex justify-center">
           <img 
-            src="/iconos/isotipo-claro.png" 
+            src="/iconos/isotipo-color.png" 
             alt="logo" 
             className="w-28 h-28 object-contain mb-6" />
         </div>

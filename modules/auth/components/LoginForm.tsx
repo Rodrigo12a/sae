@@ -35,10 +35,10 @@ export function LoginForm() {
 
     switch (role) {
       case "ADMIN":
-        router.push("/dashboard");
+        router.push("/dashboard/main");
         break;
       case "DOCENTE":
-        router.push("/dashboard");
+        router.push("/dashboard/main");
         break;
       case "ALUMNO":
         router.push("/form");
