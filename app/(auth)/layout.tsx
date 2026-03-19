@@ -1,75 +1,137 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const instructions = [
-    {
-      title: "Conéctate",
-      description: "Accede con tu cuenta institucional para personalizar tu perfil.",
-      image: "/iconos/seguro.png"
-    },
-    {
-      title: "Monitorea",
-      description: "Revisa tu estatus académico y detecta oportunidades a tiempo.",
-      image: "/iconos/lupa.png"
-    },
-    {
-      title: "Impúlsate",
-      description: "Recibe planes de acción diseñados para asegurar tu graduación.",
-      image: "/iconos/graduacion.png"
-    }
-  ];
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentStep((prev) => (prev + 1) % instructions.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-[#A10500]">
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       
-      {/* Sección Izquierda: Branding y Carrusel */}
-      <section className="hidden md:flex relative text-white items-center justify-center p-12 sticky top-0 h-screen overflow-hidden">
+      {/* Sección Izquierda*/}
+      <section className="hidden md:flex relative text-white items-center justify-center p-12 sticky top-0 h-screen overflow-hidden bg-gradient-to-br from-[#7A0000] via-[#A10500] to-[#D62828]">
         
-        <div className="relative z-10 max-w-md w-full space-y-8 text-center transition-all duration-500">
-          <div className="text-4xl font-bold mb-4">SAE</div>
-          
-          <div className="h-44 m-10 flex items-center justify-center">
-            <img 
-              src={instructions[currentStep].image} 
-              alt="Instrucción"
-              className="max-h-full object-contain animate-fade-in" 
-            />
-          </div>
+        <div className="absolute w-[500px] h-[500px] bg-red-500 opacity-20 rounded-full blur-[120px] top-[-100px] left-[-100px] animate-pulse" />
+        <div className="absolute w-[400px] h-[400px] bg-amber-300 opacity-10 rounded-full blur-[100px] bottom-[-100px] right-[-100px] animate-pulse" />
 
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">{instructions[currentStep].title}</h2>
-            <p className="text-lg opacity-80 min-h-[60px]">
-              {instructions[currentStep].description}
-            </p>
-          </div>
+        <div className="absolute w-72 h-72 bg-white/10 backdrop-blur-2xl rounded-full top-10 left-10 blur-3xl opacity-40 animate-float" />
+        <div className="absolute w-96 h-96 bg-white/5 backdrop-blur-2xl rounded-full bottom-10 right-10 blur-3xl opacity-30 animate-float-slow" />
+        <div className="absolute w-40 h-40 bg-white/10 backdrop-blur-xl rounded-full top-1/2 left-1/3 blur-2xl opacity-20 animate-float" />
 
-          <div className="flex justify-center space-x-2">
-            {instructions.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentStep(index)}
-                className={`h-2 w-2 rounded-full transition-all ${
-                  currentStep === index ? "bg-white w-6" : "bg-white/40"
-                }`}
+        {/*  Textura */}
+        <div className="absolute inset-0 opacity-10 bg-[url(/imagenes/noise-texture.png)] bg-cover" />
+        
+        {/*    //!Figuras animadas  */}
+                  {/* Animated SVG background */}
+                  <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 400 600"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <defs>
+              <pattern id="sae-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(251,176,59,0.07)" strokeWidth="0.5" />
+              </pattern>
+              <radialGradient id="sae-cglow" cx="50%" cy="48%" r="50%">
+                <stop offset="0%"   stopColor="#fbb03b" stopOpacity="0.18" />
+                <stop offset="100%" stopColor="#fbb03b" stopOpacity="0"    />
+              </radialGradient>
+              <radialGradient id="sae-tglow" cx="50%" cy="0%" r="60%">
+                <stop offset="0%"   stopColor="#ff5020" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#A10500"  stopOpacity="0"   />
+              </radialGradient>
+            </defs>
+ 
+            {/* Grid */}
+            <rect width="400" height="600" fill="url(#sae-grid)" />
+ 
+            {/* Diagonal lines */}
+            <line x1="0" y1="600" x2="400" y2="0" stroke="rgba(251,176,59,0.06)" strokeWidth="0.5" />
+            <line x1="400" y1="600" x2="0" y2="0" stroke="rgba(251,176,59,0.06)" strokeWidth="0.5" />
+ 
+            {/* Central glow */}
+            <ellipse cx="200" cy="295" rx="180" ry="180" fill="url(#sae-cglow)">
+              <animate attributeName="rx" values="180;200;170;180" dur="8s"  repeatCount="indefinite" />
+              <animate attributeName="ry" values="180;170;200;180" dur="10s" repeatCount="indefinite" />
+            </ellipse>
+ 
+            {/* Top burst */}
+            <ellipse cx="200" cy="0" rx="220" ry="160" fill="url(#sae-tglow)" />
+ 
+            {/* Pulsing concentric rings */}
+            <circle cx="200" cy="295" r="130" fill="none" stroke="rgba(251,176,59,0.12)" strokeWidth="0.5">
+              <animate attributeName="r"       values="130;145;130" dur="6s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="1;0.5;1"     dur="6s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="200" cy="295" r="165" fill="none" stroke="rgba(251,176,59,0.07)" strokeWidth="0.5">
+              <animate attributeName="r"       values="165;178;165" dur="8s" repeatCount="indefinite" begin="1s" />
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="8s" repeatCount="indefinite" begin="1s" />
+            </circle>
+            <circle cx="200" cy="295" r="200" fill="none" stroke="rgba(251,176,59,0.04)" strokeWidth="0.5">
+              <animate attributeName="r" values="200;215;200" dur="10s" repeatCount="indefinite" begin="2s" />
+            </circle>
+            
+            {/* Rotating dashed orbit */}
+            <circle
+              cx="200" cy="295" r="148"
+              fill="none"
+              stroke="rgba(251,176,59,0.15)"
+              strokeWidth="0.5"
+              strokeDasharray="6 10"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 200 295"
+                to="360 200 295"
+                dur="60s"
+                repeatCount="indefinite"
               />
-            ))}
-          </div>
+            </circle>
+ 
+            {/* Orbiting dots */}
+            <circle r="3" fill="rgba(251,176,59,0.7)">
+              <animateMotion dur="12s" repeatCount="indefinite"
+                path="M200,295 m-148,0 a148,148 0 1,1 296,0 a148,148 0 1,1 -296,0" />
+            </circle>
+            <circle r="2" fill="rgba(255,255,255,0.5)">
+              <animateMotion dur="12s" repeatCount="indefinite" begin="-6s"
+                path="M200,295 m-148,0 a148,148 0 1,1 296,0 a148,148 0 1,1 -296,0" />
+            </circle>
+ 
+            {/* Corner accent marks */}
+            <line x1="0"   y1="80"  x2="0"   y2="0"   stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="0"   y1="0"   x2="80"  y2="0"   stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="400" y1="0"   x2="320" y2="0"   stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="400" y1="0"   x2="400" y2="80"  stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="0"   y1="520" x2="0"   y2="600" stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="0"   y1="600" x2="80"  y2="600" stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="400" y1="520" x2="400" y2="600" stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+            <line x1="320" y1="600" x2="400" y2="600" stroke="rgba(251,176,59,0.2)" strokeWidth="1" />
+          </svg>
+
+        {/*  //!Fin de figuras animadas  */}
+
+        {/*  Contenido */}
+        <div className="relative z-10 max-w-md text-center space-y-6 animate-fade-in">
+        <Image 
+          src={'/iconos/isotipo-blanco.png'} 
+          width={100} 
+          height={100} 
+          alt="Isotipo SAE"
+          className="mx-auto block drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+        />
+          
+          <p className="text-xl font-medium leading-relaxed">
+            Gestiona tu trayectoria académica de forma inteligente
+          </p>
+
+          <p className="text-sm text-red-100">
+            alcanza tus objetivos desde un solo lugar.
+          </p>
         </div>
 
-        <div className="absolute inset-0 opacity-10 bg-[url('/textura-monkqi.png')] bg-cover" />
       </section>
 
+      {/* Sección Derecha */}
       <section className="flex flex-col bg-[#F2F2F2] min-h-screen">
         <div className="flex-grow flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-md">

@@ -13,6 +13,7 @@ export function AuthTabs() {
       {/* Tabs */}
       <div className="relative border-b flex">
         <button
+          type="button"
           onClick={() => setActive("login")}
           className={`flex-1 pb-3 text-sm font-medium transition-colors ${
             active === "login"
@@ -24,10 +25,11 @@ export function AuthTabs() {
         </button>
 
         <button
+          type="button"
           onClick={() => setActive("register")}
           className={`flex-1 pb-3 text-sm font-medium transition-colors hover ${
             active === "register"
-              ? "text-red-700"
+              ? "text-[#A10500]"
               : "text-gray-400"
           }`}
         >
@@ -36,7 +38,7 @@ export function AuthTabs() {
 
         {/* Línea animada */}
         <span
-          className={`absolute bottom-0 h-[2px] w-1/2 bg-red-700 transition-transform duration-300 ${
+          className={`absolute bottom-0 h-[2px] w-1/2 bg-[#A10500] transition-transform duration-300 ${
             active === "login"
               ? "translate-x-0"
               : "translate-x-full"

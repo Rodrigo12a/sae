@@ -4,6 +4,12 @@ import { useState } from "react";
 // import { useAuth } from "../hooks/useAuth"; // Descomenta cuando conectes el backend
 import { PasswordInput } from "./PasswordInput";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Register',
+  description: 'Registro de usuario',
+ };
 
 export function RegisterForm() {
   const [password, setPassword] = useState("");
@@ -46,7 +52,10 @@ export function RegisterForm() {
 
       </div>
 
-      <button className="w-full rounded-md bg-[#A10500] py-3 text-white font-semibold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:bg-[#fbb03b] active:scale-95 active:translate-y-0 active:shadow-sm">
+      <button
+        type="button"
+        className="w-full rounded-md bg-[#A10500] py-3 text-white font-semibold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:bg-[#fbb03b] active:scale-95 active:translate-y-0 active:shadow-sm"
+      >
         Registrarse
       </button>
     </div>

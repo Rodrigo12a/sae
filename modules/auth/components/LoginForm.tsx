@@ -4,6 +4,14 @@ import { useState } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { PasswordInput } from "./PasswordInput";
+import { Metadata } from "next";
+import { FcGoogle } from "react-icons/fc";
+import { FaApple } from "react-icons/fa";
+
+export const metadata: Metadata = {
+  title: 'Login',
+  description: 'Inicio de sesión',
+ };
 
 export function LoginForm() {
   const router = useRouter();
@@ -35,8 +43,6 @@ export function LoginForm() {
 
     switch (role) {
       case "ADMIN":
-        router.push("/dashboard/main");
-        break;
       case "DOCENTE":
         router.push("/dashboard/main");
         break;
@@ -55,21 +61,19 @@ export function LoginForm() {
 
       {/* Botones Sociales */}
       <div className="space-y-3">
-        <button className="w-full rounded-md border border-gray-300 py-3 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 font-medium shadow-sm">
-          <img 
-            src="/iconos/apple.png" 
-            alt="Apple logo" 
-            className="w-5 h-5 object-contain" 
-          />
+        <button
+          type="button"
+          className="w-full rounded-md border border-gray-300 py-3 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 font-medium shadow-sm"
+        >
+        <FaApple size={30} />
           Iniciar Sesión con Apple
         </button>
         
-        <button className="w-full rounded-md border border-gray-300 py-3 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 font-medium shadow-sm">
-          <img 
-            src="/iconos/google.png" 
-            alt="Google logo" 
-            className="w-5 h-5 object-contain" 
-          />
+        <button
+          type="button"
+          className="w-full rounded-md border border-gray-300 py-3 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 font-medium shadow-sm"
+        >
+        <FcGoogle size={30} />
           Iniciar Sesión con Google
         </button>
       </div>
@@ -106,12 +110,14 @@ export function LoginForm() {
       </div>
       <div className="flex justify-end">
         <button 
+        type="button"
         className="text-sm font-medium text-[#A10500] hover:text-red-800 transition-colors">
           ¿Olvidaste tu contraseña?
         </button>
       </div>
 
       <button 
+      type="button"
       onClick={handleLogin}
       disabled={loading}
       className="w-full rounded-md bg-[#A10500] py-3 text-white font-semibold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:bg-[#fbb03b] active:scale-95 active:translate-y-0 active:shadow-sm">

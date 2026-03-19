@@ -7,6 +7,7 @@ import { PiChartScatterBold } from "react-icons/pi"
 import { SistemMenuItem } from "./sistem/SistemMenuItem"
 import { ButtonLogout } from "@/modules/auth/components"
 import { FiLogOut } from "react-icons/fi"
+import { BsDatabaseDown } from "react-icons/bs"
 
 const navegationItems = [
   {
@@ -26,6 +27,17 @@ const navegationItems = [
     icon: <TbChartDots3Filled/>,
     title: 'Derivaciones',
     subTitle: 'Mi dashboard'
+  },
+  {
+    title: "Database",
+    subTitle: "Database Manager",
+    path: "/database",
+    icon: <BsDatabaseDown />,
+    children: [
+      { title: "Tables", path: "/database/tables" },
+      { title: "Queries", path: "/database/queries" },
+      { title: "Backups", path: "/database/backups" }
+    ]
   }
 
 ]

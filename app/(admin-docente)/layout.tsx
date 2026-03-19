@@ -1,7 +1,7 @@
 'use client';
 
-import { Sidebar } from './components';
-import { Navbar } from './components/navbar/Navbar';
+import { Sidebar } from '../../modules/dashboard/components';
+import { Navbar } from '../../modules/dashboard/components/navbar/Navbar';
 
 export default function DashboardLayout({
   children,
