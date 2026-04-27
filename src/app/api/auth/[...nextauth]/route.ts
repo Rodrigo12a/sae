@@ -65,7 +65,20 @@ const handler = NextAuth({
     },
   },
 
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/login", // Redirigir al login si hay error de credenciales
+  },
+
+  debug: process.env.NODE_ENV === "development" || !!process.env.DEBUG_AUTH,
+
   secret: process.env.NEXTAUTH_SECRET,
+
+  logger: {
+    error(code, metadata) {
+      console.error("[NextAuth Error]", code, metadata);
+    },
+  },
 });
 
 export { handler as GET, handler as POST };

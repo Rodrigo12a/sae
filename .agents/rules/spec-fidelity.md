@@ -120,8 +120,8 @@ src/
 
 ### 8. Conexión con el Backend
 
-- URL base del backend: `https://sae-backend-theta.vercel.app/api`
-- Documentación Swagger: `https://sae-backend-theta.vercel.app/api/docs`
+- URL base del backend: `https://sae-backend-beige.vercel.app/api`
+- Documentación Swagger: `https://sae-backend-beige.vercel.app/api/docs`
 - **Nunca hardcodear** la URL base. Usar siempre `NEXT_PUBLIC_API_URL` (o equivalente de entorno).
 - Todo endpoint usado debe estar documentado en `design.md` en su sección correspondiente.
 - Si el backend aún no expone un endpoint necesario para una HU, usar **mock con contrato tipado** (TypeScript interface) y documentar con `// TODO: conectar a POST /api/endpoint cuando esté disponible`.

@@ -7,10 +7,21 @@
 
 import { LoginDto, LoginResponse } from "../domain/types";
 
-// Helper para obtener URL base
+// Helper para obtener URL base institucional
 const getBaseUrl = () => {
-  const url = process.env.NEXT_PUBLIC_API_URL || "https://sae-backend-beige.vercel.app";
-  return url.endsWith('/') ? url.slice(0, -1) : url;
+  let url = process.env.NEXT_PUBLIC_API_URL || "https://sae-backend-beige.vercel.app";
+  
+  // Limpiar barra final si existe
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+
+  // Asegurar que incluya /api para el backend real
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  
+  return url;
 };
 
 export const authService = {

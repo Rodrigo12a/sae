@@ -6,6 +6,7 @@ declare module "next-auth" {
     user: {
       id: string;
       role: string;
+      uid?: string; // Alias para compatibilidad con componentes antiguos
       name?: string | null;
       email?: string | null;
       image?: string | null;
