@@ -80,8 +80,8 @@ export function checkPermission(
  */
 export const ROLE_ROUTE_MAP: Record<string, UserRole[]> = {
   '/tutor':      ['tutor'],
-  '/admin':      ['administrador'],
-  '/psicologo':  ['psicologo'],
-  '/medico':     ['medico'],
-  '/estudiante': ['estudiante'],
+  '/admin':      ['administrador', 'admin' as any],
+  '/psicologo':  ['psicologo', 'psychologist' as any],
+  '/medico':     ['medico', 'doctor' as any],
+  '/estudiante': ['estudiante', 'student' as any],
 };

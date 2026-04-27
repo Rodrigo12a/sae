@@ -22,8 +22,8 @@ export const authService = {
     try {
       // Detectar si el identificador es una matrícula (solo dígitos)
       const isMatricula = /^\d+$/.test(data.email);
-      
-      const payload = isMatricula 
+
+      const payload = isMatricula
         ? { matricula: data.email, password: data.password }
         : { email: data.email, password: data.password };
 

@@ -10,7 +10,7 @@ import { ROLE_ROUTE_MAP } from "@/src/lib/rbac.config";
  *              Centraliza el RBAC y la protección de rutas.
  */
 export default withAuth(
-  function middleware(req) {
+  function proxy(req) {
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
     const role = (token?.role as string)?.toLowerCase();

@@ -24,6 +24,13 @@ export const ROLE_DASHBOARDS: Record<UserRole, string> = {
 export const getDashboardByRole = (role: UserRole | string | undefined | null): string => {
   if (!role) return ROLE_DASHBOARDS.tutor;
   
-  const normalizedRole = role.toLowerCase() as UserRole;
-  return ROLE_DASHBOARDS[normalizedRole] || ROLE_DASHBOARDS.tutor;
+  const normalizedRole = role.toLowerCase();
+  
+  // Mapeo de alias a roles canónicos
+  if (normalizedRole === 'admin') return ROLE_DASHBOARDS.administrador;
+  if (normalizedRole === 'psychologist') return ROLE_DASHBOARDS.psicologo;
+  if (normalizedRole === 'doctor') return ROLE_DASHBOARDS.medico;
+  if (normalizedRole === 'student') return ROLE_DASHBOARDS.estudiante;
+  
+  return ROLE_DASHBOARDS[normalizedRole as UserRole] || ROLE_DASHBOARDS.tutor;
 };
