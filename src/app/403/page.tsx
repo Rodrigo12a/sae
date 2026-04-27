@@ -2,12 +2,8 @@
  * @module ForbiddenPage
  * @epic EPICA-1 Autenticación y Control de Acceso
  * @hu HU002
- * @ux UXAU-06
- * @description Página de acceso denegado. El middleware redirige aquí cuando el rol
- *              no tiene permiso para la ruta solicitada. Diseño austero/institucional.
- *              El botón "Ir a mi panel" redirige automáticamente según el rol del usuario.
- * @privacy No expone información sobre qué ruta se intentó acceder
- * @qa QA-03 (UI amigable sin revelar datos del sistema)
+ * @description Página 403 premium para el proyecto SAE.
+ *              Bloqueo visual estricto pero con estética alineada al sistema de diseño.
  */
 
 'use client';
@@ -15,7 +11,7 @@
 import React from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { FiShield, FiArrowLeft } from 'react-icons/fi';
+import { FiShieldOff, FiArrowLeft, FiLock } from 'react-icons/fi';
 import { getDashboardByRole } from '@/src/features/auth/utils/redirection';
 import { UserRole } from '@/src/features/auth/domain/types';
 
@@ -29,68 +25,64 @@ export default function ForbiddenPage() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center px-6"
-      role="main"
-      aria-labelledby="forbidden-title"
-    >
-
-      {/* Contenedor principal */}
-      <div className="w-full max-w-md text-center space-y-8">
-
-        {/* Logotipo / Marca Institucional */}
-        <div className="flex justify-center">
-          <div
-            className="w-20 h-20 rounded-2xl bg-white border border-[var(--border-subtle)] shadow-sm flex items-center justify-center"
-            aria-hidden="true"
-          >
-            <FiShield size={36} className="text-[var(--color-primary)]" />
+    <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      {/* Elementos decorativos de fondo (Glows en rojo/advertencia) */}
+      <div className="absolute top-[-5%] right-[-5%] w-[45%] h-[45%] bg-[var(--color-danger)] opacity-[0.02] blur-[140px] rounded-full" />
+      
+      <div className="w-full max-w-lg text-center z-10">
+        {/* Escudo de Seguridad */}
+        <div className="flex justify-center mb-8">
+          <div className="relative group">
+            <div className="w-24 h-24 rounded-[2rem] bg-white border border-[var(--border-subtle)] shadow-2xl flex items-center justify-center transition-transform group-hover:rotate-12">
+              <FiShieldOff size={44} className="text-[var(--color-danger)] opacity-90" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-2xl flex items-center justify-center shadow-lg">
+              <FiLock size={18} className="text-[var(--text-muted)]" />
+            </div>
           </div>
         </div>
 
-        {/* Mensajes */}
-        <div className="space-y-3">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">
-            Error 403
-          </p>
-          <h1
-            id="forbidden-title"
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Acceso no autorizado
-          </h1>
-          <p className="text-[var(--text-secondary)] leading-relaxed max-w-sm mx-auto">
-            No tienes los permisos necesarios para ver esta sección. 
-            Si crees que esto es un error, contacta a tu administrador institucional.
-          </p>
+        {/* Mensajes de Error */}
+        <div className="space-y-4 mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-danger)]/5 border border-[var(--color-danger)]/10 text-[var(--color-danger)] text-xs font-bold uppercase tracking-widest">
+            Acceso Denegado · Error 403
+          </div>
+          
+          <div className="space-y-3">
+            <h1 className="text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
+              Sección Protegida
+            </h1>
+            <p className="text-[var(--text-secondary)] text-lg max-w-md mx-auto leading-relaxed">
+              Tu rol actual (<span className="text-[var(--color-primary)] font-semibold">{session?.user?.role || 'Visitante'}</span>) 
+              no tiene los permisos suficientes para acceder a este recurso.
+            </p>
+          </div>
         </div>
 
-        {/* Separador */}
-        <div className="w-16 h-px bg-[var(--border-subtle)] mx-auto" aria-hidden="true" />
+        {/* Contenedor de Acción con Glassmorphism */}
+        <div className="bg-white/40 backdrop-blur-md border border-white/50 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center gap-6">
+          <p className="text-sm text-[var(--text-muted)] text-center">
+            Si crees que esto es un error de tu perfil docente, <br />
+            por favor contacta al administrador de tu plantel.
+          </p>
+          
+          <button
+            onClick={handleGoToPanel}
+            className="
+              w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 h-[60px]
+              bg-[var(--text-primary)] text-white font-bold rounded-2xl
+              hover:bg-black hover:shadow-xl transition-all active:scale-[0.98]
+            "
+          >
+            <FiArrowLeft size={20} />
+            Regresar a mi panel seguro
+          </button>
+        </div>
 
-        {/* Acción principal */}
-        <button
-          onClick={handleGoToPanel}
-          className="
-            inline-flex items-center gap-2.5 px-6 h-[52px]
-            bg-[var(--color-primary)] text-white font-bold rounded-xl
-            hover:bg-[var(--color-primary-hover)] active:scale-[0.98]
-            transition-all shadow-sm
-          "
-          aria-label="Regresar a tu panel de inicio"
-        >
-          <FiArrowLeft size={18} aria-hidden="true" />
-          Ir a mi panel
-        </button>
-
-        {/* Información de soporte */}
-        <p className="text-xs text-[var(--text-muted)]">
-          Si el problema persiste, escribe a{' '}
-          <span className="font-semibold text-[var(--text-secondary)]">
-            soporte@sae.institucional.edu
-          </span>
+        {/* Soporte Institucional */}
+        <p className="mt-12 text-xs text-[var(--text-muted)] flex items-center justify-center gap-2">
+          ID de Seguridad SAE: <code className="bg-[var(--bg-secondary)] px-2 py-0.5 rounded text-[var(--text-secondary)]">RBAC-{session?.user?.id?.slice(0, 8) || 'GUEST'}</code>
         </p>
-
       </div>
     </div>
   );

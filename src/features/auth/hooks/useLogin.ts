@@ -1,13 +1,13 @@
 /**
  * @module useLogin
  * @epic EPICA-1 Autenticación y Control de Acceso
- * @hu HU001
+ * @hu HU001, HU002
  * @description Hook para orquestar el login, bloqueo y redirección basada en roles y consentimiento.
  */
 
 import { useState, useEffect } from 'react';
 import { signIn, getSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { LoginDto, UserRole } from '../domain/types';
 import { getDashboardByRole } from '../utils/redirection';
 
@@ -54,6 +54,9 @@ export function useLogin() {
     return () => clearInterval(timer);
   }, [isBlocked, timeRemaining]);
 
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
+
   const handleLogin = async (data: LoginDto) => {
     if (isBlocked) return;
 
@@ -85,7 +88,12 @@ export function useLogin() {
         if (needsConsent) {
           router.push('/auth/consent');
         } else {
-          router.push(getDashboardByRole(userRole));
+          // Si hay un callbackUrl válido (interno), lo usamos; si no, vamos al dashboard del rol
+          const destination = (callbackUrl && callbackUrl.startsWith('/')) 
+            ? callbackUrl 
+            : getDashboardByRole(userRole);
+            
+          router.push(destination);
         }
         
         router.refresh();

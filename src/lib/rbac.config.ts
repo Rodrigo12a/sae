@@ -79,8 +79,9 @@ export function checkPermission(
  * No modifiques esta tabla sin actualizar también el middleware.
  */
 export const ROLE_ROUTE_MAP: Record<string, UserRole[]> = {
-  '/tutor':     ['tutor'],
-  '/admin':     ['administrador'],
-  '/psicologo': ['psicologo'],
-  '/medico':    ['medico'],
+  '/tutor':      ['tutor'],
+  '/admin':      ['administrador'],
+  '/psicologo':  ['psicologo'],
+  '/medico':     ['medico'],
+  '/estudiante': ['estudiante'],
 };
