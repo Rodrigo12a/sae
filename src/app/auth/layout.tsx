@@ -14,25 +14,19 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[var(--bg-main)] font-['Inter']">
-      
+
       {/* Panel Izquierdo: Branding e Imagen Institucional (Premium) */}
       <aside className="hidden md:flex md:w-5/12 lg:w-1/2 bg-[var(--color-primary)] relative overflow-hidden items-center justify-center p-12 text-white">
         {/* Capas de diseño abstracto */}
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#1E3A5F] to-[#16324F] z-0" />
         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-[var(--color-secondary)] opacity-10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[var(--color-accent)] opacity-5 rounded-full blur-[100px]" />
-        
+
         <div className="relative z-10 max-w-lg space-y-8 animate-fade-in">
           <div className="space-y-4">
-            <Image 
-              src="/iconos/isotipo-blanco.png" 
-              width={120} 
-              height={120} 
-              alt="Isotipo SAE"
-              className="drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] mb-8"
-            />
+
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
-              Acompañamiento <br/>
+              Acompañamiento <br />
               <span className="text-[var(--color-accent)]">Inteligente</span>
             </h1>
             <p className="text-xl text-blue-100 opacity-80 leading-relaxed max-w-md">
@@ -58,15 +52,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="w-full flex-grow flex items-center justify-center p-6 sm:p-12">
           <div className="w-full max-w-[450px] animate-fade-in">
             {/* Logo visible solo en móvil */}
-            <div className="md:hidden flex justify-center mb-10">
-               <Image 
-                src="/iconos/isotipo-color.png" 
-                width={80} 
-                height={80} 
-                alt="Logo SAE"
-              />
-            </div>
-            
+
+
             {children}
           </div>
         </div>
