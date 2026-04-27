@@ -16,11 +16,6 @@ const getBaseUrl = () => {
     url = url.slice(0, -1);
   }
 
-  // Asegurar que incluya /api para el backend real
-  if (!url.endsWith('/api')) {
-    url = `${url}/api`;
-  }
-  
   return url;
 };
 
