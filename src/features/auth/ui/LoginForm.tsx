@@ -55,7 +55,7 @@ export const LoginForm: React.FC = () => {
         <div className="space-y-1.5">
           <div className="flex justify-between items-center px-1">
             <label htmlFor="password" className="text-sm font-bold text-[var(--text-secondary)]">Contraseña</label>
-            <Link href="/auth/forgot" className="text-xs font-bold text-[var(--color-secondary)] hover:underline">
+            <Link href="/auth/forgot-password" className="text-xs font-bold text-[var(--color-secondary)] hover:underline">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
