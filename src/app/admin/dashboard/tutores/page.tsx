@@ -35,7 +35,7 @@ export default function TutoresPage() {
 
   useEffect(() => { loadStats(); }, []);
 
-  const alertCount = tutorStats.filter(t => t.missedFollowUps > 0 || t.incompleteRecords > 0).length;
+  const alertCount = tutorStats.filter(t => t.inconsistenciesCount > 0).length;
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">

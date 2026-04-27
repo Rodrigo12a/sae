@@ -73,7 +73,7 @@ export const SurveyContainer: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Excluimos la Edad (index 0) y el Género (index 1) según requerimiento,
+      // Excluimos la Edad (index 0) y el Género (index 1),
       // enviando solo las respuestas a partir del índice 2.
       const payload = (answers as number[]).slice(2);
       await surveyService.submit(payload);
@@ -94,7 +94,7 @@ export const SurveyContainer: React.FC = () => {
         </div>
         <h2 className="text-3xl font-black text-[var(--text-primary)] mb-4 tracking-tight">¡Cuestionario Completado!</h2>
         <p className="text-[var(--text-secondary)] font-medium leading-relaxed mb-8">
-          Tus respuestas han sido recibidas y serán procesadas por nuestro sistema de acompañamiento institucional. 
+          Tus respuestas han sido recibidas y serán procesadas por nuestro sistema de acompañamiento institucional.
           Apreciamos tu honestidad y tiempo.
         </p>
         <button
@@ -117,7 +117,7 @@ export const SurveyContainer: React.FC = () => {
           Cuestionario de Acompañamiento Estudiantil
         </h1>
         <p className="text-lg text-[var(--text-secondary)] font-medium mb-10 leading-relaxed">
-          Este cuestionario nos ayuda a entender tu situación actual y brindarte el apoyo necesario para asegurar tu éxito académico. 
+          Este cuestionario nos ayuda a entender tu situación actual y brindarte el apoyo necesario para asegurar tu éxito académico.
           Tus respuestas son confidenciales y se procesarán únicamente con fines de acompañamiento.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
@@ -194,7 +194,7 @@ export const SurveyContainer: React.FC = () => {
           <span className="text-sm font-black text-blue-600">{Math.round(progress)}%</span>
         </div>
         <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-          <motion.div 
+          <motion.div
             className="h-full bg-gradient-to-r from-blue-600 to-indigo-600"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -233,16 +233,14 @@ export const SurveyContainer: React.FC = () => {
                     <button
                       key={opt.value}
                       onClick={() => handleAnswer(opt.value)}
-                      className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all font-bold text-sm ${
-                        answers[currentIndex] === opt.value
+                      className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all font-bold text-sm ${answers[currentIndex] === opt.value
                           ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-md'
                           : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50 text-gray-600'
-                      }`}
+                        }`}
                     >
                       <span>{opt.label}</span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        answers[currentIndex] === opt.value ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-                      }`}>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${answers[currentIndex] === opt.value ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                        }`}>
                         {answers[currentIndex] === opt.value && <FiCheckCircle className="text-white" size={14} />}
                       </div>
                     </button>
@@ -257,16 +255,14 @@ export const SurveyContainer: React.FC = () => {
                     <button
                       key={opt.value}
                       onClick={() => handleAnswer(opt.value)}
-                      className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all font-bold text-sm ${
-                        answers[currentIndex] === opt.value
+                      className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all font-bold text-sm ${answers[currentIndex] === opt.value
                           ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-md'
                           : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50 text-gray-600'
-                      }`}
+                        }`}
                     >
                       <span>{opt.label}</span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        answers[currentIndex] === opt.value ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-                      }`}>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${answers[currentIndex] === opt.value ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
+                        }`}>
                         {answers[currentIndex] === opt.value && <FiCheckCircle className="text-white" size={14} />}
                       </div>
                     </button>
@@ -305,9 +301,8 @@ export const SurveyContainer: React.FC = () => {
         <button
           onClick={handleBack}
           disabled={currentIndex === 0 || isSubmitting}
-          className={`flex items-center gap-2 font-black text-sm transition-all ${
-            currentIndex === 0 ? 'opacity-0' : 'text-gray-400 hover:text-gray-700'
-          }`}
+          className={`flex items-center gap-2 font-black text-sm transition-all ${currentIndex === 0 ? 'opacity-0' : 'text-gray-400 hover:text-gray-700'
+            }`}
         >
           <FiArrowLeft /> Anterior
         </button>
