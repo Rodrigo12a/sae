@@ -26,10 +26,19 @@
 
   /* Semáforo de riesgo */
   --semaforo-rojo: #D64545;
+  --semaforo-rojo-light: #FEE2E2;
   --semaforo-amarillo: #F4B740;
+  --semaforo-amarillo-light: #FEF3C7;
   --semaforo-verde: #2FA36B;
+  --semaforo-verde-light: #DCFCE7;
   --semaforo-ojo: #7E57C2;
+  --semaforo-ojo-light: #EDE9FE;
   --semaforo-gris: #94A3B8;
+  --semaforo-gris-light: #F1F5F9;
+
+  /* Colores de estado informativo */
+  --color-info: #3B82F6;
+  --color-info-light: #EFF6FF;
 
   /* Tipografía */
   --text-primary: #1E293B;

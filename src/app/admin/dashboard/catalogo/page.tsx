@@ -348,7 +348,7 @@ export default function CatalogoAlertasPage() {
                         placeholder="Ej. Ingeniería en Inteligencia Artificial"
                         className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all text-sm font-bold text-slate-700"
                         value={formData.nombre || ''}
-                        onChange={e => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
+                        onChange={e => setFormData((prev: Partial<Carrera & AlertTag>) => ({ ...prev, nombre: e.target.value }))}
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -360,7 +360,7 @@ export default function CatalogoAlertasPage() {
                           placeholder="Ej. IIA"
                           className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-black text-indigo-600 uppercase"
                           value={formData.codigo || ''}
-                          onChange={e => setFormData(prev => ({ ...prev, codigo: e.target.value.toUpperCase() }))}
+                          onChange={e => setFormData((prev: Partial<Carrera & AlertTag>) => ({ ...prev, codigo: e.target.value.toUpperCase() }))}
                         />
                       </div>
                       <div className="space-y-3">
@@ -368,7 +368,7 @@ export default function CatalogoAlertasPage() {
                         <select 
                           className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-bold text-slate-700"
                           value={formData.activa ? 'true' : 'false'}
-                          onChange={e => setFormData(prev => ({ ...prev, activa: e.target.value === 'true' }))}
+                          onChange={e => setFormData((prev: Partial<Carrera & AlertTag>) => ({ ...prev, activa: e.target.value === 'true' }))}
                         >
                           <option value="true">Activa y Visible</option>
                           <option value="false">Inactiva (Oculta)</option>
@@ -386,7 +386,7 @@ export default function CatalogoAlertasPage() {
                         placeholder="Ej. Riesgo Académico Leve"
                         className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-bold text-slate-700"
                         value={formData.etiqueta || ''}
-                        onChange={e => setFormData(prev => ({ ...prev, etiqueta: e.target.value }))}
+                        onChange={e => setFormData((prev: Partial<Carrera & AlertTag>) => ({ ...prev, etiqueta: e.target.value }))}
                       />
                     </div>
                     <div className="space-y-3">
@@ -396,7 +396,7 @@ export default function CatalogoAlertasPage() {
                           <button
                             key={n}
                             type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, nivel: n }))}
+                            onClick={() => setFormData((prev: Partial<Carrera & AlertTag>) => ({ ...prev, nivel: n }))}
                             className={`py-3 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${
                               formData.nivel === n 
                                 ? n === 'rojo' ? 'bg-red-50 border-red-500 text-red-600' :
@@ -416,7 +416,7 @@ export default function CatalogoAlertasPage() {
                         placeholder="Instrucciones para el tutor al ver esta etiqueta..."
                         className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-medium text-slate-600"
                         value={formData.descripcion || ''}
-                        onChange={e => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
+                        onChange={e => setFormData((prev: Partial<Carrera & AlertTag>) => ({ ...prev, descripcion: e.target.value }))}
                       />
                     </div>
                   </>

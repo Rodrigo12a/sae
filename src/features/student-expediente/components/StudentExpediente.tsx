@@ -9,8 +9,8 @@
 
 import React, { useState } from 'react';
 import { FiUser, FiBook, FiActivity, FiMessageSquare, FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
-import { StudentHealthDetail } from '../../medico/components/StudentHealthDetail';
-import { useStudentProfile } from '../../dashboard-tutor/hooks/useStudentProfile';
+import { StudentHealthDetail } from '@/src/features/medico/components/StudentHealthDetail';
+import { useStudentProfile } from '@/src/features/dashboard-tutor/hooks/useStudentProfile';
 import { SkeletonCard } from '@/src/components/ui/SkeletonCard';
 import { useSession } from 'next-auth/react';
 import { ReferralContextPanel } from '../../medico/components/ReferralContextPanel/ReferralContextPanel';

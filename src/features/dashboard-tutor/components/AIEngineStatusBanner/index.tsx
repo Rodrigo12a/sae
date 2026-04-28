@@ -20,25 +20,25 @@ export function AIEngineStatusBanner() {
 
   const config = {
     degraded: {
-      icon: <FiAlertTriangle className="text-orange-500" />,
-      bg: 'bg-orange-50',
-      border: 'border-orange-200',
+      icon: <FiAlertTriangle style={{ color: 'var(--semaforo-amarillo)' }} />,
+      bg: 'bg-[var(--semaforo-amarillo-light)]',
+      border: 'border-[var(--semaforo-amarillo)]',
       text: 'El Motor de IA presenta latencia. Algunos indicadores podrían estar desactualizados.',
-      color: 'text-orange-800'
+      color: 'text-[var(--text-primary)]'
     },
     unavailable: {
-      icon: <FiCloudOff className="text-red-500" />,
-      bg: 'bg-red-50',
-      border: 'border-red-200',
+      icon: <FiCloudOff style={{ color: 'var(--semaforo-rojo)' }} />,
+      bg: 'bg-[var(--semaforo-rojo-light)]',
+      border: 'border-[var(--semaforo-rojo)]',
       text: 'Motor de IA fuera de línea. Se muestran datos de la última sincronización exitosa.',
-      color: 'text-red-800'
+      color: 'text-[var(--text-primary)]'
     }
   }[status as 'degraded' | 'unavailable'] || {
-    icon: <FiInfo />,
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
+    icon: <FiInfo style={{ color: 'var(--color-info)' }} />,
+    bg: 'bg-[var(--color-info-light)]',
+    border: 'border-[var(--color-info)]',
     text: 'Estado del motor desconocido.',
-    color: 'text-blue-800'
+    color: 'text-[var(--text-primary)]'
   };
 
   const formattedDate = lastUpdate 
