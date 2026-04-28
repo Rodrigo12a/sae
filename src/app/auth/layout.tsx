@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Panel Izquierdo: Branding e Imagen Institucional (Premium) */}
       <aside className="hidden md:flex md:w-5/12 lg:w-1/2 bg-[var(--color-primary)] relative overflow-hidden items-center justify-center p-12 text-white">
         {/* Capas de diseño abstracto */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#1E3A5F] to-[#16324F] z-0" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-hover)] z-0" />
         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-[var(--color-secondary)] opacity-10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[var(--color-accent)] opacity-5 rounded-full blur-[100px]" />
 
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               Acompañamiento <br />
               <span className="text-[var(--color-accent)]">Inteligente</span>
             </h1>
-            <p className="text-xl text-blue-100 opacity-80 leading-relaxed max-w-md">
+            <p className="text-xl text-[var(--color-secondary-light)] opacity-80 leading-relaxed max-w-md">
               Plataforma de gestión académica avanzada para la excelencia estudiantil.
             </p>
           </div>
@@ -48,7 +48,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </aside>
 
       {/* Panel Derecho: Contenido de formulario y acciones */}
-      <main className="flex-1 flex flex-col bg-[#F2F2F2] items-center justify-center relative">
+      <main className="flex-1 flex flex-col bg-[var(--bg-main)] items-center justify-center relative">
         <div className="w-full flex-grow flex items-center justify-center p-6 sm:p-12">
           <div className="w-full max-w-[450px] animate-fade-in">
             {/* Logo visible solo en móvil */}

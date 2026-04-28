@@ -27,18 +27,18 @@ export const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ path, icon, ti
       className={`
         group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 relative
         ${isActive 
-          ? 'bg-[var(--color-secondary)] text-white shadow-lg shadow-blue-900/20' 
-          : 'text-slate-400 hover:bg-white/5 hover:text-white'
+          ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-text-active)] shadow-lg shadow-black/20' 
+          : 'text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--sidebar-text-active)]'
         }
       `}
     >
-      <div className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 opacity-80'}`}>
+      <div className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'text-[var(--sidebar-text-active)]' : 'text-[var(--sidebar-text)] opacity-80'}`}>
         {icon}
       </div>
       
       <div className="flex flex-col flex-1 truncate">
         <span className="text-[13px] font-bold tracking-wide">{title}</span>
-        <span className={`text-[10px] font-medium opacity-60 uppercase tracking-tighter ${isActive ? 'text-blue-100' : 'text-slate-500'}`}>
+        <span className={`text-[10px] font-medium opacity-60 uppercase tracking-tighter ${isActive ? 'text-white/80' : 'text-[var(--sidebar-text)]'}`}>
           {subTitle}
         </span>
       </div>
@@ -46,7 +46,7 @@ export const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ path, icon, ti
       {badge && (
         <span className={`
           absolute right-4 px-1.5 py-0.5 rounded-md text-[10px] font-black
-          ${isActive ? 'bg-white text-[var(--color-secondary)]' : 'bg-red-500 text-white'}
+          ${isActive ? 'bg-white text-[var(--color-secondary)]' : 'bg-[var(--color-primary)] text-white'}
         `}>
           {badge}
         </span>

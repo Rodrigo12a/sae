@@ -8,6 +8,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { FiBell, FiChevronDown, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
+import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 
 export const Navbar: React.FC = () => {
@@ -70,9 +71,13 @@ export const Navbar: React.FC = () => {
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Cuenta</p>
               </div>
               
-              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-slate-50 hover:text-[var(--color-primary)] transition-colors text-left font-medium">
+              <Link 
+                href={`/${session?.user?.role || 'tutor'}/profile`}
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-slate-50 hover:text-[var(--color-primary)] transition-colors text-left font-medium"
+              >
                 <FiUser className="text-slate-400" /> Mi Perfil
-              </button>
+              </Link>
               
               <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-slate-100 hover:text-[var(--color-primary)] transition-colors text-left font-medium">
                 <FiSettings className="text-slate-400" /> Configuración

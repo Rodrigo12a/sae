@@ -2,12 +2,18 @@
 
 :root {
   /* Colores primarios */
-  --color-primary: #1E3A5F;
-  --color-primary-hover: #16324F;
-  --brand-primary: #3A7BC8;
-  --color-secondary: #3A7BC8;   
-  --color-secondary-light: #DCE9F8;
-  --color-accent: #5AA9E6; 
+  --color-primary: #a10500;
+  /* El rojo base que solicitaste */
+  --color-primary-hover: #800400;
+  /* Un tono más oscuro para el estado hover */
+  --brand-primary: #c91a14;
+  /* Un rojo más vibrante para la marca */
+  --color-secondary: #fa3015d8;
+  /* Un borgoña profundo para balancear */
+  --color-secondary-light: #fce8e8;
+  /* Un rosado muy sutil para fondos y estados light */
+  --color-accent: #ffbe4d;
+  /* Un rojo coral brillante para destacar elementos */
 
   /* Fondos */
   --bg-main: #F9FAFB;
@@ -34,6 +40,14 @@
   /* Otros */
   --background: #F9FAFB;
   --foreground: #1E293B;
+
+  /* Sidebar */
+  --sidebar-bg: #27292B;
+  --sidebar-active-bg: var(--color-secondary);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-text: #94A3B8;
+  --sidebar-text-active: #FFFFFF;
+  --sidebar-accent: var(--color-accent);
 }
 
 @theme inline {
@@ -51,25 +65,50 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   color: var(--text-primary);
 }
 
 @keyframes float {
-  0% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(-20px) translateX(10px); }
-  100% { transform: translateY(0px) translateX(0px); }
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
 }
 
 @keyframes floatSlow {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-30px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-30px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-float {

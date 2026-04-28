@@ -57,6 +57,33 @@ export const RBAC_MATRIX: Record<UserRole, RBACMap> = {
 // usar el hook useRBAC o el componente RoleGuard
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Mapa de alias de rol del backend → clave canónica del frontend */
+export const ROLE_ALIAS_MAP: Record<string, UserRole> = {
+  psychologist:   'psicologo',
+  doctor:         'medico',
+  admin:          'administrador',
+  student:        'estudiante',
+  teacher:        'tutor',
+  docente:        'tutor',
+  profesor:       'tutor',
+  // Formas ya canónicas (pass-through) y con acentos:
+  psicologo:      'psicologo',
+  'psicólogo':    'psicologo',
+  medico:         'medico',
+  'médico':       'medico',
+  administrador:  'administrador',
+  estudiante:     'estudiante',
+  tutor:          'tutor',
+};
+
+/**
+ * Normaliza un rol (puede venir del backend con alias distinto) al formato canónico.
+ */
+function normalizeRole(role: string | undefined | null): UserRole | null {
+  if (!role) return null;
+  return ROLE_ALIAS_MAP[role.toLowerCase()] ?? null;
+}
+
 /**
  * Verifica si un rol tiene permiso para realizar una acción sobre un recurso.
  * @returns true si el permiso existe en la matriz RBAC local
@@ -68,7 +95,9 @@ export function checkPermission(
   action: Action,
 ): boolean {
   if (!role) return false;
-  const roleMap = RBAC_MATRIX[role as UserRole];
+  const canonical = normalizeRole(role as string);
+  if (!canonical) return false;
+  const roleMap = RBAC_MATRIX[canonical];
   if (!roleMap) return false;
   const allowedActions = roleMap[resource];
   return Array.isArray(allowedActions) && allowedActions.includes(action);

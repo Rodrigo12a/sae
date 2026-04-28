@@ -13,7 +13,7 @@
 
 import { useSession } from 'next-auth/react';
 import { UserRole, ResourceKey, Action } from '@/src/features/auth/domain/types';
-import { checkPermission } from '@/src/lib/rbac.config';
+import { checkPermission, ROLE_ALIAS_MAP } from '@/src/lib/rbac.config';
 
 interface UseRBACReturn {
   /** Verifica si el usuario puede realizar una acción sobre un recurso */
@@ -40,7 +40,9 @@ export function useRBAC(): UseRBACReturn {
 
   const isLoading = status === 'loading';
   const isAuthenticated = status === 'authenticated';
-  const role = (session?.user?.role as UserRole) ?? null;
+  
+  const rawRole = session?.user?.role as string | undefined;
+  const role: UserRole | null = rawRole ? (ROLE_ALIAS_MAP[rawRole.toLowerCase()] ?? null) : null;
 
   const can = (resource: ResourceKey, action: Action): boolean => {
     if (isLoading || !role) return false;

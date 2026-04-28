@@ -95,3 +95,79 @@ export const exportAdminReport = async (request: import('@/src/features/dashboar
     }, 2000); // 2 segundos de carga para efecto UI
   });
 };
+
+/**
+ * Gestión de Carreras
+ */
+export const getAdminCarreras = async (): Promise<any[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        { id: '1', nombre: 'Ingeniería en Sistemas Computacionales', codigo: 'ISC', activa: true },
+        { id: '2', nombre: 'Ingeniería Industrial', codigo: 'IIND', activa: true },
+        { id: '3', nombre: 'Licenciatura en Administración', codigo: 'LADM', activa: true },
+        { id: '4', nombre: 'Licenciatura en Derecho', codigo: 'LDER', activa: true },
+      ]);
+    }, 500);
+  });
+};
+
+export const updateCarrera = async (id: string, data: any): Promise<void> => {
+  console.log('API: Updating carrera', id, data);
+  return new Promise((resolve) => {
+    setTimeout(resolve, 800);
+  });
+};
+
+export const deleteCarrera = async (id: string): Promise<void> => {
+  console.log('API: Deleting carrera', id);
+  return new Promise((resolve) => {
+    setTimeout(resolve, 800);
+  });
+};
+
+export const createCarrera = async (data: any): Promise<void> => {
+  console.log('API: Creating carrera', data);
+  return new Promise((resolve) => {
+    setTimeout(resolve, 800);
+  });
+};
+
+/**
+ * Gestión de Catálogo de Alertas
+ */
+export const updateAlertTag = async (id: string, data: any): Promise<void> => {
+  console.log('API: Updating alert tag', id, data);
+  return new Promise((resolve) => {
+    setTimeout(resolve, 800);
+  });
+};
+
+export const createAlertTag = async (data: any): Promise<void> => {
+  console.log('API: Creating alert tag', data);
+  return new Promise((resolve) => {
+    setTimeout(resolve, 800);
+  });
+};
+
+export const deleteAlertTag = async (id: string): Promise<void> => {
+  console.log('API: Deleting alert tag', id);
+  return new Promise((resolve) => {
+    setTimeout(resolve, 800);
+  });
+};
+
+/**
+ * Gestión de Catálogo de Alertas
+ */
+export const getAlertCatalog = async (): Promise<any[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        { id: 'A1', etiqueta: 'Apoyo Académico Urgente', nivel: 'rojo', descripcion: 'Estudiantes con riesgo académico crítico.' },
+        { id: 'A2', etiqueta: 'Seguimiento Socioeconómico', nivel: 'amarillo', descripcion: 'Estudiantes con problemas financieros detectados.' },
+        { id: 'A3', etiqueta: 'Apoyo Psicológico', nivel: 'revisar', descripcion: 'Derivación para atención mental.' },
+      ]);
+    }, 500);
+  });
+};

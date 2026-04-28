@@ -15,6 +15,7 @@
 'use client';
 
 import React from 'react';
+import { FiLock } from 'react-icons/fi';
 import { useRBAC } from '@/src/hooks/useRBAC';
 import { ResourceKey, Action } from '@/src/features/auth/domain/types';
 
@@ -64,10 +65,23 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
     return <>{loadingSkeleton}</>;
   }
 
-  // Rol no tiene permiso: renderizar fallback (o nada)
+  // Rol no tiene permiso: renderizar fallback (o mensaje de acceso denegado en dev)
   // IMPORTANTE: children NUNCA se monta en el DOM en este branch
   if (!can(resource, action)) {
-    return <>{fallback}</>;
+    if (fallback) return <>{fallback}</>;
+    
+    // Fallback por defecto para evitar pantallas en blanco confusas
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-red-50/50 rounded-3xl border border-dashed border-red-200 animate-fade-in">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 mb-4">
+          <FiLock size={32} />
+        </div>
+        <h3 className="text-lg font-bold text-red-900">Acceso Restringido</h3>
+        <p className="text-sm text-red-600 mt-1 max-w-xs mx-auto">
+          No tienes los permisos necesarios para ver este contenido ({resource}:{action}).
+        </p>
+      </div>
+    );
   }
 
   // Acceso permitido

@@ -23,11 +23,14 @@ interface StudentChecklistRowProps {
 export function StudentChecklistRow({ entry, conditions, onChange, disabled }: StudentChecklistRowProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSelection, setPendingSelection] = useState<string[] | null>(null);
+  const [activeCategory, setActiveCategory] = useState<MedicalCondition['category'] | 'todas'>('todas');
+
+  const filteredConditions = activeCategory === 'todas' 
+    ? conditions 
+    : conditions.filter(c => c.category === activeCategory);
 
   const handleConditionChange = (newSelection: string[]) => {
     if (entry.existingRecord && newSelection.length > entry.selectedConditions.length) {
-      // Intentan agregar condiciones a alguien que ya tenía expediente
-      // y no han sido confirmados. Interceptamos:
       setPendingSelection(newSelection);
       setShowConfirmModal(true);
     } else {
@@ -50,25 +53,67 @@ export function StudentChecklistRow({ entry, conditions, onChange, disabled }: S
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-4 p-4 border-b border-gray-100 items-start sm:items-center hover:bg-gray-50 transition-colors">
-        <div className="flex-shrink-0 w-full sm:w-1/3">
-          <div className="font-medium text-gray-900">{entry.studentName}</div>
-          <div className="text-sm text-gray-500">Matrícula: {entry.matricula}</div>
-          {entry.existingRecord && (
-            <div className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-              <FiAlertCircle className="w-3 h-3" />
-              Expediente previo
-            </div>
-          )}
+      <div className="flex flex-col gap-6 p-6 border-b border-gray-100 items-start hover:bg-slate-50/50 transition-colors">
+        <div className="flex justify-between items-start w-full">
+          <div className="flex-shrink-0">
+            <div className="font-bold text-slate-900 text-lg">{entry.studentName}</div>
+            <div className="text-sm font-black text-slate-400 uppercase tracking-tighter">Matrícula: {entry.matricula}</div>
+            {entry.existingRecord && (
+              <div className="inline-flex items-center gap-1 mt-2 text-xs font-black text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                <FiAlertCircle className="w-3 h-3" />
+                EXPEDIENTE PREVIO DETECTADO
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {[
+              { id: 'ayuno', label: 'Ayuno' },
+              { id: 'id', label: 'ID' },
+              { id: 'consent', label: 'Consentimiento' },
+            ].map(req => (
+              <label key={req.id} className="flex items-center gap-2 cursor-pointer group bg-white px-3 py-1.5 rounded-xl border border-slate-200 hover:border-indigo-300 transition-all shadow-sm">
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                />
+                <span className="text-xs font-black text-slate-500 group-hover:text-slate-700 select-none uppercase">
+                  {req.label}
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
         
-        <div className="flex-1 w-full">
+        <div className="w-full space-y-4">
+          <div className="flex items-center gap-4 border-b border-slate-100 pb-2 overflow-x-auto no-scrollbar">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Filtrar por:</span>
+            {(['todas', 'física', 'visual', 'auditiva', 'psicológica', 'otra'] as const).map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`
+                  text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all whitespace-nowrap
+                  ${activeCategory === cat 
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
+                    : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}
+                `}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <ConditionSelector 
-            conditions={conditions}
+            conditions={filteredConditions}
             selectedIds={entry.selectedConditions}
             onChange={handleConditionChange}
             disabled={disabled}
           />
+
+          {filteredConditions.length === 0 && activeCategory !== 'todas' && (
+            <p className="text-xs text-slate-400 italic">No hay condiciones en la categoría "{activeCategory}" para este perfil.</p>
+          )}
         </div>
       </div>
 
