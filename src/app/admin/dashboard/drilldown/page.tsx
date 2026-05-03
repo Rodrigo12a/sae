@@ -17,7 +17,6 @@ import { toast } from 'sonner';
 
 export default function DrilldownPage() {
   const [filters, setFilters] = useState<KPIFilters>({});
-  const [selectedCareer, setSelectedCareer] = useState<string>('all');
 
   const { data, isLoading, isError, refetch } = useAdminKPIs(filters);
 
@@ -26,6 +25,12 @@ export default function DrilldownPage() {
   };
 
   const careers = data?.comparativaPorCarrera ?? [];
+  
+  // Determinar qué carrera mostrar en el detalle
+  // 1. Si hay una carrera seleccionada en el FilterPanel, esa manda.
+  // 2. Si no, pero hay datos de comparativa, usamos la primera de la lista.
+  // 3. Si no hay nada, string vacío.
+  const activeDrillDownId = filters.careerId || (careers.length > 0 ? careers[0].careerId : '');
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
@@ -47,7 +52,7 @@ export default function DrilldownPage() {
         availableCareers={data?.carrerasActivas}
       />
 
-      {isLoading && (
+      {isLoading && !data && (
         <div className="grid grid-cols-1 gap-6">
           <SkeletonCard className="h-[200px]" />
           <SkeletonCard className="h-[400px]" />
@@ -64,24 +69,24 @@ export default function DrilldownPage() {
         </div>
       )}
 
-      {!isLoading && !isError && data && (
+      {!isError && (data || !isLoading) && (
         <>
-          {/* Selector de carrera */}
+          {/* Selector de carrera (Quick access a las cargadas en el dashboard) */}
           {careers.length > 0 && (
             <div className="bg-white border border-[var(--border-subtle)] rounded-2xl p-4 shadow-sm">
-              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Seleccionar carrera</p>
+              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Acceso rápido por carrera</p>
               <div className="flex flex-wrap gap-2">
                 <button
-                  onClick={() => setSelectedCareer('all')}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${selectedCareer === 'all' ? 'bg-[var(--color-secondary)] text-white shadow' : 'bg-[var(--bg-section)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'}`}
+                  onClick={() => setFilters({ ...filters, careerId: undefined })}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${!filters.careerId ? 'bg-[var(--color-secondary)] text-white shadow' : 'bg-[var(--bg-section)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'}`}
                 >
-                  Todas
+                  Todas (KPIs)
                 </button>
                 {careers.map((c) => (
                   <button
                     key={c.careerId}
-                    onClick={() => setSelectedCareer(c.careerId)}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${selectedCareer === c.careerId ? 'bg-[var(--color-secondary)] text-white shadow' : 'bg-[var(--bg-section)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'}`}
+                    onClick={() => setFilters({ ...filters, careerId: c.careerId })}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filters.careerId === c.careerId ? 'bg-[var(--color-secondary)] text-white shadow' : 'bg-[var(--bg-section)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'}`}
                   >
                     {c.careerName}
                   </button>
@@ -91,13 +96,21 @@ export default function DrilldownPage() {
           )}
 
           {/* Panel de drill-down */}
-          <DrillDownPanel
-            request={{
-              careerId: selectedCareer === 'all' ? careers[0]?.careerId ?? '' : selectedCareer,
-              semester: filters.semester,
-            }}
-            onNavigateToStudent={handleNavigateToStudent}
-          />
+          {activeDrillDownId ? (
+            <DrillDownPanel
+              request={{
+                careerId: activeDrillDownId,
+                semester: filters.semester,
+              }}
+              onNavigateToStudent={handleNavigateToStudent}
+            />
+          ) : !isLoading && (
+            <div className="bg-white border border-[var(--border-subtle)] rounded-2xl p-12 text-center shadow-sm">
+              <FiAlertCircle className="text-[var(--text-muted)] mx-auto mb-3" size={32} />
+              <h3 className="font-bold text-[var(--text-primary)] mb-1">Selecciona una carrera</h3>
+              <p className="text-sm text-[var(--text-secondary)]">Para ver el detalle de estudiantes, selecciona una carrera en el panel superior.</p>
+            </div>
+          )}
         </>
       )}
     </div>

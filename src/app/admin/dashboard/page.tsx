@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
       />
 
       {/* Loading State */}
-      {isLoading && (
+      {isLoading && !data && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <SkeletonCard className="h-[120px]" />

@@ -48,7 +48,7 @@ export default function TutorTutoradosPage() {
   const handleSave = async (data: CreateUserDto) => {
     let success = false;
     if (selectedUser) {
-      success = await handleUpdate(selectedUser.id, data);
+      success = await handleUpdate(selectedUser.uid, data);
       if (success) toast.success('Estudiante actualizado correctamente');
     } else {
       success = await handleCreate(data);
@@ -59,7 +59,7 @@ export default function TutorTutoradosPage() {
 
   const confirmDelete = async (user: User) => {
     if (window.confirm(`¿Estás seguro de eliminar a ${user.nombre}? Esta acción no se puede deshacer.`)) {
-      const success = await handleDelete(user.id);
+      const success = await handleDelete(user.uid);
       if (success) toast.success('Estudiante eliminado correctamente');
     }
   };
@@ -138,7 +138,7 @@ export default function TutorTutoradosPage() {
             className="flex flex-col gap-3"
           >
             {tutorados.map(tutorado => (
-              <li key={tutorado.id}>
+              <li key={tutorado.uid}>
                 <TutoradoListItem
                   tutorado={tutorado}
                   onEdit={() => openEditModal(tutorado)}
@@ -187,8 +187,7 @@ function TutoradoListItem({
     >
       {/* Avatar */}
       <div
-        className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
-        style={{ backgroundColor: tutorado.cuentaActiva ? '#3A7BC8' : '#94A3B8' }}
+        className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white bg-[var(--color-secondary)]"
         aria-hidden="true"
       >
         {initials}

@@ -31,43 +31,10 @@ export const getAdminKPIs = async (filters?: KPIFilters): Promise<AdminKPIs> => 
 
 // TODO: conectar a GET /api/admin/groups/:id/drill-down cuando esté disponible
 export const getAdminDrillDown = async (request: DrillDownRequest): Promise<DrillDownResponse> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        careerId: request.careerId,
-        careerName: request.careerId === 'ing-sistemas' ? 'Ing. en Sistemas' : 
-                    request.careerId === 'ing-industrial' ? 'Ing. Industrial' : 
-                    request.careerId === 'lic-administracion' ? 'Lic. en Administración' : 'Lic. en Derecho',
-        totalStudentsAtRisk: 3,
-        students: [
-          {
-            id: 'S1001',
-            name: 'María González Pérez',
-            semester: request.semester || 4,
-            etiquetaOperativa: 'Apoyo Académico Urgente',
-            semaforoEstado: 'rojo',
-            predominantVariables: ['Bajo rendimiento en ciencias básicas', 'Ausentismo recurrente (>30%)'],
-          },
-          {
-            id: 'S1002',
-            name: 'Carlos Mendoza Ruiz',
-            semester: request.semester || 4,
-            etiquetaOperativa: 'Seguimiento Socioeconómico',
-            semaforoEstado: 'amarillo',
-            predominantVariables: ['Riesgo de pago de colegiatura', 'Baja participación en plataforma'],
-          },
-          {
-            id: 'S1003',
-            name: 'Ana Beltrán Silva',
-            semester: request.semester || 4,
-            etiquetaOperativa: 'Revisión por Coordinación',
-            semaforoEstado: 'revisar',
-            predominantVariables: ['Alertas múltiples de tutores', 'Datos demográficos atípicos'],
-          }
-        ]
-      });
-    }, 600);
+  const response = await apiClient.get<DrillDownResponse>(`/admin/groups/${request.careerId}/drill-down`, {
+    params: { semester: request.semester }
   });
+  return response.data;
 };
 
 // TODO: conectar a POST /api/admin/reports/export cuando esté disponible

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getAdminKPIs } from '@/src/services/api/admin';
 import { KPIFilters } from '../types';
 
@@ -15,6 +15,7 @@ export const useAdminKPIs = (filters?: KPIFilters) => {
   return useQuery({
     queryKey: ['admin-kpis', filters],
     queryFn: () => getAdminKPIs(filters),
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000, // 5 minutos de frescura
     refetchInterval: 5 * 60 * 1000, // Refrescar cada 5 minutos
   });

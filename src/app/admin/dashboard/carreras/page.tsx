@@ -54,7 +54,7 @@ export default function CarrerasPage() {
         availableCareers={data?.carrerasActivas}
       />
 
-      {isLoading && (
+      {isLoading && !data && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <SkeletonCard className="h-[380px]" />
           <SkeletonCard className="h-[380px]" />
