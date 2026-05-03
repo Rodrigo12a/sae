@@ -115,12 +115,26 @@ export const referralsService = {
         studentName: 'Sofía Martínez',
         motivoId: '5',
         descripcionObservable: 'Solicitud de apoyo por estrés académico y ansiedad.',
-        createdAt: new Date(Date.now() - 3600000 * 4).toISOString(), // hace 4 horas
+        createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
         department: 'psychology',
         aiValidation: {
           isAutoReport: true,
           symptomatologyDetected: true,
           confidence: 0.94
+        }
+      },
+      {
+        id: 'ref-004',
+        studentId: 'stu-006',
+        studentName: 'Roberto Gómez',
+        motivoId: '3',
+        descripcionObservable: 'El estudiante reporta mareos constantes durante las clases de educación física.',
+        createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+        department: 'medical',
+        aiValidation: {
+          isAutoReport: false,
+          symptomatologyDetected: true,
+          confidence: 0.88
         }
       }
     ];

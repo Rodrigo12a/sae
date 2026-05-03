@@ -14,6 +14,8 @@ import { useStudentProfile } from '@/src/features/dashboard-tutor/hooks/useStude
 import { SkeletonCard } from '@/src/components/ui/SkeletonCard';
 import { useSession } from 'next-auth/react';
 import { ReferralContextPanel } from '../../medico/components/ReferralContextPanel/ReferralContextPanel';
+import { Drawer } from '@/src/components/ui/Drawer';
+
 
 interface StudentExpedienteProps {
   studentId: string;
@@ -32,23 +34,24 @@ export const StudentExpediente: React.FC<StudentExpedienteProps> = ({ studentId,
   const { data: session } = useSession();
   const role = session?.user?.role as string;
   const { data: student, isLoading } = useStudentProfile(studentId);
-  const [activeTab, setActiveTab] = useState<'contexto' | 'perfil' | 'academico' | 'salud' | 'psicologico'>(derivation ? 'contexto' : 'perfil');
+  const [activeTab, setActiveTab] = useState<'perfil' | 'academico' | 'salud' | 'psicologico'>('perfil');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 
   if (isLoading) return <SkeletonCard className="h-[500px]" />;
 
   const tabs = [
-    { id: 'contexto', label: 'Contexto', icon: <FiAlertCircle />, roles: ['medico', 'psicologo', 'administrador'], hideIfNoDerivation: true },
     { id: 'perfil', label: 'Perfil', icon: <FiUser /> },
     { id: 'academico', label: 'Académico', icon: <FiTrendingUp /> },
     { id: 'salud', label: 'Salud', icon: <FiActivity />, roles: ['medico', 'psicologo', 'administrador'] },
     { id: 'psicologico', label: 'Psicológico', icon: <FiMessageSquare />, roles: ['psicologo', 'administrador'] },
   ];
 
+
   const visibleTabs = tabs.filter(tab => {
-    const hasRole = !tab.roles || tab.roles.includes(role);
-    const hasDerivation = !tab.hideIfNoDerivation || derivation;
-    return hasRole && hasDerivation;
+    return !tab.roles || tab.roles.includes(role);
   });
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -71,7 +74,16 @@ export const StudentExpediente: React.FC<StudentExpedienteProps> = ({ studentId,
               }`}>
               {student?.semaforoEstado || 'Normal'}
             </span>
+            {derivation && (
+              <button 
+                onClick={() => setIsDrawerOpen(true)}
+                className="flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+              >
+                <FiAlertCircle /> Ver Caso Derivado
+              </button>
+            )}
           </div>
+
           <p className="text-sm font-bold text-[var(--text-muted)] mt-1 uppercase tracking-widest">
             {student?.carrera} • {student?.matricula || studentId}
           </p>
@@ -98,9 +110,7 @@ export const StudentExpediente: React.FC<StudentExpedienteProps> = ({ studentId,
 
       {/* Contenido de Tabs */}
       <div className="flex-1">
-        {activeTab === 'contexto' && derivation && (
-          <ReferralContextPanel derivation={derivation} />
-        )}
+
         {activeTab === 'perfil' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-[var(--bg-panel)] rounded-3xl p-8 border border-[var(--border-subtle)] shadow-sm">
@@ -210,6 +220,31 @@ export const StudentExpediente: React.FC<StudentExpedienteProps> = ({ studentId,
           </div>
         )}
       </div>
+
+      {/* Sidebar de Contexto (Drawer) */}
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title="Contexto de Derivación Especial"
+      >
+        {derivation && (
+          <div className="space-y-6">
+            <ReferralContextPanel derivation={derivation} />
+            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-4">
+              <div className="p-2 bg-amber-600 text-white rounded-lg">
+                <FiAlertCircle />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-amber-900">Nota Confidencial</h4>
+                <p className="text-xs text-amber-700 mt-1">
+                  Este contexto fue proporcionado por el tutor. Cualquier hallazgo clínico debe ser registrado en la sección de Salud.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
+
   );
 };

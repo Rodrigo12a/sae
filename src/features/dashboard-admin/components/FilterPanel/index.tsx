@@ -13,9 +13,10 @@ import { KPIFilters } from '../../types';
 interface FilterPanelProps {
   filters: KPIFilters;
   onChange: (filters: KPIFilters) => void;
+  availableCareers?: { id: string; nombre: string }[];
 }
 
-export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onChange }) => {
+export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onChange, availableCareers }) => {
   return (
     <div className="bg-white p-4 rounded-2xl border border-[var(--border-subtle)] shadow-sm flex flex-col md:flex-row gap-4 items-center">
       <div className="flex-1 w-full">
@@ -27,10 +28,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onChange }) =
           className="w-full bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-lg p-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
         >
           <option value="">Todas las carreras</option>
-          <option value="ing-sistemas">Ing. en Sistemas</option>
-          <option value="ing-industrial">Ing. Industrial</option>
-          <option value="lic-administracion">Lic. en Administración</option>
-          <option value="lic-derecho">Lic. en Derecho</option>
+          {availableCareers?.map((carrera) => (
+            <option key={carrera.id} value={carrera.id}>
+              {carrera.nombre}
+            </option>
+          ))}
         </select>
       </div>
       

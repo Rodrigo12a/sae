@@ -1,3 +1,11 @@
+/**
+ * @module UserTable
+ * @epic EPICA-6 Panel Ejecutivo y Administración
+ * @hu HU002, HU023
+ * @ux UX-ADM-01 (Gestión de Usuarios)
+ * @api GET /api/users · PATCH /api/users/:id · DELETE /api/users/:id
+ */
+
 import React from 'react';
 import { User, UserRole } from '@/src/services/api/users';
 import { FiEdit2, FiTrash2, FiUser, FiMail, FiShield, FiMoreVertical } from 'react-icons/fi';
@@ -5,7 +13,7 @@ import { FiEdit2, FiTrash2, FiUser, FiMail, FiShield, FiMoreVertical } from 'rea
 interface UserTableProps {
   users: User[];
   onEdit: (user: User) => void;
-  onDelete: (id: string) => void;
+  onDelete: (uid: string) => void;
   isLoading: boolean;
 }
 
@@ -40,18 +48,21 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, i
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => {
+          {users.map((user, index) => {
             const roleInfo = ROLE_LABELS[user.role] || { label: user.role, color: 'text-slate-700', bg: 'bg-slate-50' };
+            
+            // Garantizamos una clave única incluso si el ID falta o está duplicado en los datos
+            const rowKey = user.uid || `user-${index}`;
             
             return (
               <tr 
-                key={user.id} 
+                key={rowKey} 
                 className="bg-white border border-[var(--border-subtle)] rounded-xl shadow-sm hover:shadow-md transition-all group"
               >
                 <td className="px-6 py-4 rounded-l-xl border-y border-l border-[var(--border-subtle)]">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full ${roleInfo.bg} flex items-center justify-center text-[var(--color-secondary)] font-bold text-sm`}>
-                      {user.nombre.charAt(0)}
+                      {user.nombre?.charAt(0) || 'U'}
                     </div>
                     <div>
                       <div className="font-bold text-[var(--text-primary)] text-sm">{user.nombre}</div>
@@ -70,7 +81,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, i
                 </td>
                 <td className="px-6 py-4 border-y border-[var(--border-subtle)]">
                   <span className="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-section)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-                    {user.matricula || user.id.substring(0, 8)}
+                    {user.matricula || user.uid?.substring(0, 8) || 'S/ID'}
                   </span>
                 </td>
                 <td className="px-6 py-4 rounded-r-xl border-y border-r border-[var(--border-subtle)] text-right">
@@ -83,7 +94,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, i
                       <FiEdit2 size={16} />
                     </button>
                     <button 
-                      onClick={() => onDelete(user.id)}
+                      onClick={() => onDelete(user.uid)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Eliminar usuario"
                     >

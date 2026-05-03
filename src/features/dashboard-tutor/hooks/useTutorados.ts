@@ -10,22 +10,20 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  getTutorados,
-  createTutorado,
-  updateTutorado,
-} from '@/src/services/api/tutorados';
-import type { TutoradoItem, CreateTutoradoRequest, UpdateTutoradoRequest } from '@/src/types/tutorado';
+import { userService } from '@/src/services/api/users';
+import type { User, CreateUserDto } from '@/src/services/api/users';
+import type { CreateTutoradoRequest, UpdateTutoradoRequest } from '@/src/types/tutorado';
 
 interface UseTutoradosReturn {
-  tutorados: TutoradoItem[];
+  tutorados: User[];
   isLoading: boolean;
   error: string | null;
   isSubmitting: boolean;
   submitError: string | null;
   refetch: () => void;
-  handleCreate: (data: CreateTutoradoRequest) => Promise<boolean>;
-  handleUpdate: (matricula: string, data: UpdateTutoradoRequest) => Promise<boolean>;
+  handleCreate: (data: CreateUserDto) => Promise<boolean>;
+  handleUpdate: (id: string, data: Partial<CreateUserDto>) => Promise<boolean>;
+  handleDelete: (id: string) => Promise<boolean>;
 }
 
 /**
@@ -33,7 +31,7 @@ interface UseTutoradosReturn {
  * @privacy Estado del formulario (password) vive en el componente — no en este hook.
  */
 export function useTutorados(): UseTutoradosReturn {
-  const [tutorados, setTutorados] = useState<TutoradoItem[]>([]);
+  const [tutorados, setTutorados] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,7 +41,8 @@ export function useTutorados(): UseTutoradosReturn {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getTutorados();
+      const data = await userService.getAll();
+      // El backend ya filtra por tutorados si el rol es DOCENTE
       setTutorados(data);
     } catch {
       setError('No se pudo cargar la lista de tutorados.');
@@ -57,19 +56,17 @@ export function useTutorados(): UseTutoradosReturn {
   }, [fetchTutorados]);
 
   /** @returns true si exitoso, false si hubo error */
-  const handleCreate = async (data: CreateTutoradoRequest): Promise<boolean> => {
+  const handleCreate = async (data: CreateUserDto): Promise<boolean> => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      await createTutorado(data);
-      await fetchTutorados(); // Refrescar la lista
+      await userService.create(data);
+      await fetchTutorados(); 
       return true;
-    } catch (err) {
-      const message = err instanceof Error
-        ? (err.message === 'MATRICULA_DUPLICADA'
-          ? 'Esta matrícula ya tiene una cuenta registrada.'
-          : 'Error al crear la cuenta. Inténtalo de nuevo.')
-        : 'Error desconocido.';
+    } catch (err: any) {
+      const message = err.response?.status === 409
+        ? 'Esta matrícula o correo ya tiene una cuenta registrada.'
+        : 'Error al crear el estudiante.';
       setSubmitError(message);
       return false;
     } finally {
@@ -78,15 +75,31 @@ export function useTutorados(): UseTutoradosReturn {
   };
 
   /** @returns true si exitoso, false si hubo error */
-  const handleUpdate = async (matricula: string, data: UpdateTutoradoRequest): Promise<boolean> => {
+  const handleUpdate = async (id: string, data: Partial<CreateUserDto>): Promise<boolean> => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      await updateTutorado(matricula, data);
+      await userService.update(id, data);
       await fetchTutorados();
       return true;
     } catch {
-      setSubmitError('Error al actualizar la contraseña. Inténtalo de nuevo.');
+      setSubmitError('Error al actualizar los datos del estudiante.');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  /** @returns true si exitoso, false si hubo error */
+  const handleDelete = async (id: string): Promise<boolean> => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await userService.delete(id);
+      await fetchTutorados();
+      return true;
+    } catch {
+      setSubmitError('No se pudo eliminar al estudiante.');
       return false;
     } finally {
       setIsSubmitting(false);
@@ -102,5 +115,6 @@ export function useTutorados(): UseTutoradosReturn {
     refetch: fetchTutorados,
     handleCreate,
     handleUpdate,
+    handleDelete,
   };
 }

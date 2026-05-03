@@ -58,10 +58,10 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
       transition={{ duration: 0.3 }}
       className="w-full max-w-2xl mx-auto px-4"
     >
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-        <h2 className="text-xl font-medium text-slate-900 dark:text-white mb-8 leading-tight">
+      <div className="bg-[var(--card-bg)] rounded-2xl p-6 shadow-sm border border-[var(--border-subtle)]">
+        <h2 className="text-xl font-medium text-[var(--text-primary)] mb-8 leading-tight">
           {question.text}
-          {question.required && <span className="text-red-500 ml-1">*</span>}
+          {question.required && <span className="text-[var(--semaforo-rojo)] ml-1">*</span>}
         </h2>
 
         <div className="space-y-3">
@@ -71,14 +71,14 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
               onClick={() => handleOptionClick(option.value)}
               className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group
                 ${isSelected(option.value) 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                  : 'border-slate-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-800 bg-slate-50 dark:bg-slate-900/40'}`}
+                  ? 'border-[var(--color-primary)] bg-[var(--color-primary-light)]' 
+                  : 'border-[var(--border-subtle)] hover:border-[var(--color-primary)] bg-[var(--bg-primary)]/40'}`}
             >
-              <span className={`font-medium ${isSelected(option.value) ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300'}`}>
+              <span className={`font-medium ${isSelected(option.value) ? 'text-[var(--color-primary)]' : 'text-[var(--text-primary)]'}`}>
                 {option.label}
               </span>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
-                ${isSelected(option.value) ? 'border-blue-500 bg-blue-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                ${isSelected(option.value) ? 'border-[var(--color-primary)] bg-[var(--color-primary)]' : 'border-[var(--border-subtle)]'}`}>
                 {isSelected(option.value) && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
             </button>
@@ -90,7 +90,7 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
               onChange={(e) => onChange(e.target.value)}
               placeholder={question.placeholder}
               rows={5}
-              className="w-full p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 focus:border-blue-500 focus:ring-0 transition-all text-slate-800 dark:text-slate-200"
+              className="w-full p-4 rounded-xl border-2 border-[var(--border-subtle)] bg-[var(--bg-primary)]/40 focus:border-[var(--color-primary)] focus:ring-0 transition-all text-[var(--text-primary)]"
             />
           )}
         </div>
@@ -101,8 +101,8 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
             disabled={isFirst}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
               isFirst 
-                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'
+                ? 'text-[var(--text-secondary)] opacity-50 cursor-not-allowed' 
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]'
             }`}
           >
             Anterior
@@ -112,7 +112,7 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
             <button
               onClick={onNext}
               disabled={question.required && (!value || value.length === 0)}
-              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white rounded-xl font-semibold shadow-lg shadow-blue-200 dark:shadow-none transition-all transform active:scale-95"
+              className="px-8 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:bg-[var(--border-subtle)] text-white rounded-xl font-semibold shadow-lg shadow-[var(--color-primary)]/20 transition-all transform active:scale-95"
             >
               {isLast ? 'Finalizar' : 'Siguiente'}
             </button>

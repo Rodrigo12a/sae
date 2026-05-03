@@ -104,7 +104,7 @@ export const SurveyWizard: React.FC<SurveyWizardProps> = ({ survey }) => {
   const currentQuestion = survey.questions[currentStep];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
+    <div className="min-h-screen bg-[var(--bg-secondary)] pb-20">
       <OfflineBanner isVisible={isOffline} />
       
       <SurveyHeader 
@@ -130,8 +130,8 @@ export const SurveyWizard: React.FC<SurveyWizardProps> = ({ survey }) => {
 
       {isSubmitting && (
         <div className="fixed inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="font-medium text-slate-900 dark:text-white">Guardando tus respuestas...</p>
+          <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-medium text-[var(--text-primary)]">Guardando tus respuestas...</p>
         </div>
       )}
     </div>

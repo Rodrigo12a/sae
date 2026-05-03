@@ -39,6 +39,12 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
     description: 'Nota informativa sobre la integridad del sistema y privacidad.',
     visible: true 
   },
+  { 
+    id: 'active-careers-list', 
+    title: 'Carreras y Materias Activas', 
+    description: 'Vista detallada de los programas académicos vigentes y sus materias.',
+    visible: true 
+  },
 ];
 
 export const useDashboardStore = create<DashboardState>()(

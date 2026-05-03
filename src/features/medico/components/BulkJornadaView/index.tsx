@@ -6,8 +6,14 @@ import { useMedicalConditions } from '../../hooks/useMedicalConditions';
 import { useBulkMedicalRegister } from '../../hooks/useBulkMedicalRegister';
 import { StudentChecklistRow } from '../StudentChecklistRow';
 import { BulkHealthEntry } from '../../types';
-import { FiLock, FiFileText, FiAlertCircle, FiUsers, FiCheckCircle } from 'react-icons/fi';
+import { FiLock, FiFileText, FiAlertCircle, FiUsers, FiCheckCircle, FiActivity } from 'react-icons/fi';
 import { toast } from 'sonner';
+import { usePendingReferrals } from '@/src/features/derivaciones/hooks/usePendingReferrals';
+import { Drawer } from '@/src/components/ui/Drawer';
+import { ReferralContextPanel } from '../ReferralContextPanel/ReferralContextPanel';
+import { PendingReferral } from '@/src/features/derivaciones/types';
+import Link from 'next/link';
+
 
 /**
  * @module BulkJornadaView
@@ -20,10 +26,16 @@ import { toast } from 'sonner';
 export function BulkJornadaView() {
   const [groupId, setGroupId] = useState<string>(''); // Para simplificar, en un caso real se elegiría de un dropdown
   const [entries, setEntries] = useState<BulkHealthEntry[]>([]);
-
+  const [selectedReferral, setSelectedReferral] = useState<PendingReferral | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  
   const { data: conditions, isLoading: loadingConditions } = useMedicalConditions();
   const { data: students, isLoading: loadingStudents, isFetching } = useGroupStudents(groupId || undefined);
   const { mutate: submitBulk, isPending } = useBulkMedicalRegister();
+  const { data: referrals } = usePendingReferrals();
+
+  const medicalReferrals = referrals?.filter(r => r.department === 'medical') || [];
+
 
   // Mapeamos los datos del backend al estado local cuando se cargan
   useEffect(() => {
@@ -52,7 +64,13 @@ export function BulkJornadaView() {
     }
   };
 
+  const handleShowContext = (referral: PendingReferral) => {
+    setSelectedReferral(referral);
+    setIsDrawerOpen(true);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
+
     e.preventDefault();
     if (!groupId || entries.length === 0) return;
 
@@ -139,8 +157,11 @@ export function BulkJornadaView() {
                 entry={entry}
                 conditions={conditions}
                 onChange={handleEntryChange}
+                onShowContext={handleShowContext}
+                referral={medicalReferrals.find(r => r.studentId === entry.studentId)}
                 disabled={isPending}
               />
+
             ))}
             
             <div className="p-4 bg-gray-50 flex justify-end">
@@ -164,7 +185,60 @@ export function BulkJornadaView() {
             </div>
           </form>
         )}
+
+        {/* Empty Group State */}
+        {groupId && !isFetching && entries.length === 0 && (
+          <div className="p-12 text-center flex flex-col items-center">
+            <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mb-4 text-amber-500">
+              <FiAlertCircle className="w-8 h-8" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900">No se encontraron alumnos</h3>
+            <p className="text-gray-500 max-w-md mx-auto mt-2">
+              El grupo "{groupId}" no tiene alumnos registrados o no se han cargado correctamente. Verifica en la sección de administración si el grupo tiene nómina asignada.
+            </p>
+          </div>
+        )}
       </section>
+
+      {/* Sidebar de Contexto (Drawer) */}
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title="Contexto del Estudiante"
+      >
+        {selectedReferral && (
+          <div className="space-y-6">
+            <ReferralContextPanel 
+              derivation={{
+                id: selectedReferral.id,
+                studentName: selectedReferral.studentName,
+                tutorName: 'Tutor Institucional',
+                fecha: new Date(selectedReferral.createdAt).toLocaleDateString(),
+                motivo: selectedReferral.descripcionObservable,
+                prioridad: selectedReferral.aiValidation?.isAutoReport ? 'crítica' : 'alta'
+              }} 
+            />
+            
+            <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-start gap-4">
+              <div className="p-2 bg-indigo-600 text-white rounded-lg">
+                <FiActivity />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-indigo-900">Seguimiento Clínico</h4>
+                <p className="text-xs text-indigo-700 mt-1">
+                  Este estudiante tiene una derivación activa. Asegúrate de registrar sus condiciones actuales en el checklist.
+                </p>
+                <Link 
+                  href={`/medico/estudiante/${selectedReferral.studentId}`}
+                  className="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all"
+                >
+                  Ver Historial Clínico Completo
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 }

@@ -1,5 +1,20 @@
-import { AdminKPIs, KPIFilters } from '@/src/features/dashboard-admin/types';
+import { 
+  AdminKPIs, 
+  KPIFilters, 
+  DrillDownRequest, 
+  DrillDownResponse, 
+  ExportRequest, 
+  ExportResponse 
+} from '@/src/features/dashboard-admin/types';
 import { api as apiClient } from '@/src/lib/api';
+import { 
+  Carrera, 
+  CreateCarreraDto, 
+  UpdateCarreraDto,
+  AlertCatalogItem,
+  CreateAlertCatalogDto,
+  UpdateAlertCatalogDto
+} from '@/src/types/admin';
 
 /**
  * Servicio de API para endpoints del Administrador
@@ -10,31 +25,12 @@ import { api as apiClient } from '@/src/lib/api';
 
 // TODO: conectar a GET /api/admin/kpis cuando esté disponible
 export const getAdminKPIs = async (filters?: KPIFilters): Promise<AdminKPIs> => {
-  // Simulando llamada real
-  // const response = await apiClient.get<AdminKPIs>('/admin/kpis', { params: filters });
-  // return response.data;
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        riesgoGlobal: Math.floor(Math.random() * 20) + 40, // 40-60
-        alertasAtendidas: Math.floor(Math.random() * 50) + 100, // 100-150
-        alertasIgnoradas: Math.floor(Math.random() * 20) + 10, // 10-30
-        comparativaPorCarrera: [
-          { careerId: 'ing-sistemas', careerName: 'Ing. en Sistemas', riskIndex: Math.floor(Math.random() * 20) + 50 },
-          { careerId: 'ing-industrial', careerName: 'Ing. Industrial', riskIndex: Math.floor(Math.random() * 20) + 40 },
-          { careerId: 'lic-administracion', careerName: 'Lic. en Administración', riskIndex: Math.floor(Math.random() * 20) + 30 },
-          { careerId: 'lic-derecho', careerName: 'Lic. en Derecho', riskIndex: Math.floor(Math.random() * 20) + 35 },
-        ],
-        dataFreshness: new Date().toISOString(),
-        latencyMs: Math.floor(Math.random() * 100) + 50, // 50-150ms latency (falsa)
-      });
-    }, 800);
-  });
+  const response = await apiClient.get<AdminKPIs>('/admin/kpis', { params: filters });
+  return response.data;
 };
 
 // TODO: conectar a GET /api/admin/groups/:id/drill-down cuando esté disponible
-export const getAdminDrillDown = async (request: import('@/src/features/dashboard-admin/types').DrillDownRequest): Promise<import('@/src/features/dashboard-admin/types').DrillDownResponse> => {
+export const getAdminDrillDown = async (request: DrillDownRequest): Promise<DrillDownResponse> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -75,12 +71,10 @@ export const getAdminDrillDown = async (request: import('@/src/features/dashboar
 };
 
 // TODO: conectar a POST /api/admin/reports/export cuando esté disponible
-export const exportAdminReport = async (request: import('@/src/features/dashboard-admin/types').ExportRequest): Promise<import('@/src/features/dashboard-admin/types').ExportResponse> => {
+export const exportAdminReport = async (request: ExportRequest): Promise<ExportResponse> => {
   return new Promise((resolve) => {
     // Simular tiempo de procesamiento
     setTimeout(() => {
-      // Simular que algunos reportes son masivos (>10k registros)
-      // Para este mock, el PDF será "rápido" y el Excel será "procesamiento en fondo"
       if (request.format === 'excel') {
         resolve({
           status: 'processing',
@@ -92,82 +86,76 @@ export const exportAdminReport = async (request: import('@/src/features/dashboar
           downloadUrl: 'https://ejemplo.com/download/reporte_sae.pdf',
         });
       }
-    }, 2000); // 2 segundos de carga para efecto UI
+    }, 2000);
   });
 };
 
 /**
  * Gestión de Carreras
+ * @api GET /api/carreras
  */
-export const getAdminCarreras = async (): Promise<any[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { id: '1', nombre: 'Ingeniería en Sistemas Computacionales', codigo: 'ISC', activa: true },
-        { id: '2', nombre: 'Ingeniería Industrial', codigo: 'IIND', activa: true },
-        { id: '3', nombre: 'Licenciatura en Administración', codigo: 'LADM', activa: true },
-        { id: '4', nombre: 'Licenciatura en Derecho', codigo: 'LDER', activa: true },
-      ]);
-    }, 500);
-  });
+export const getAdminCarreras = async (): Promise<Carrera[]> => {
+  const response = await apiClient.get<Carrera[]>('/carreras');
+  return response.data;
 };
 
-export const updateCarrera = async (id: string, data: any): Promise<void> => {
-  console.log('API: Updating carrera', id, data);
-  return new Promise((resolve) => {
-    setTimeout(resolve, 800);
-  });
+/**
+ * Crear nueva carrera
+ * @api POST /api/carreras
+ */
+export const createCarrera = async (data: CreateCarreraDto): Promise<Carrera> => {
+  const response = await apiClient.post<Carrera>('/carreras', data);
+  return response.data;
 };
 
+/**
+ * Actualizar carrera
+ * @api PATCH /api/carreras/:id
+ */
+export const updateCarrera = async (id: string, data: UpdateCarreraDto): Promise<Carrera> => {
+  const response = await apiClient.patch<Carrera>(`/carreras/${id}`, data);
+  return response.data;
+};
+
+/**
+ * Dar de baja carrera (soft delete)
+ * @api DELETE /api/carreras/:id
+ */
 export const deleteCarrera = async (id: string): Promise<void> => {
-  console.log('API: Deleting carrera', id);
-  return new Promise((resolve) => {
-    setTimeout(resolve, 800);
-  });
-};
-
-export const createCarrera = async (data: any): Promise<void> => {
-  console.log('API: Creating carrera', data);
-  return new Promise((resolve) => {
-    setTimeout(resolve, 800);
-  });
+  await apiClient.delete(`/carreras/${id}`);
 };
 
 /**
  * Gestión de Catálogo de Alertas
+ * @api GET /api/alert-catalog
  */
-export const updateAlertTag = async (id: string, data: any): Promise<void> => {
-  console.log('API: Updating alert tag', id, data);
-  return new Promise((resolve) => {
-    setTimeout(resolve, 800);
-  });
+export const getAlertCatalog = async (): Promise<AlertCatalogItem[]> => {
+  const response = await apiClient.get<AlertCatalogItem[]>('/alert-catalog');
+  return response.data;
 };
 
-export const createAlertTag = async (data: any): Promise<void> => {
-  console.log('API: Creating alert tag', data);
-  return new Promise((resolve) => {
-    setTimeout(resolve, 800);
-  });
+/**
+ * Crear nueva etiqueta de alerta
+ * @api POST /api/alert-catalog
+ */
+export const createAlertTag = async (data: CreateAlertCatalogDto): Promise<AlertCatalogItem> => {
+  const response = await apiClient.post<AlertCatalogItem>('/alert-catalog', data);
+  return response.data;
 };
 
+/**
+ * Actualizar etiqueta de alerta
+ * @api PATCH /api/alert-catalog/:id
+ */
+export const updateAlertTag = async (id: string, data: UpdateAlertCatalogDto): Promise<AlertCatalogItem> => {
+  const response = await apiClient.patch<AlertCatalogItem>(`/alert-catalog/${id}`, data);
+  return response.data;
+};
+
+/**
+ * Eliminar etiqueta de alerta
+ * @api DELETE /api/alert-catalog/:id
+ */
 export const deleteAlertTag = async (id: string): Promise<void> => {
-  console.log('API: Deleting alert tag', id);
-  return new Promise((resolve) => {
-    setTimeout(resolve, 800);
-  });
-};
-
-/**
- * Gestión de Catálogo de Alertas
- */
-export const getAlertCatalog = async (): Promise<any[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { id: 'A1', etiqueta: 'Apoyo Académico Urgente', nivel: 'rojo', descripcion: 'Estudiantes con riesgo académico crítico.' },
-        { id: 'A2', etiqueta: 'Seguimiento Socioeconómico', nivel: 'amarillo', descripcion: 'Estudiantes con problemas financieros detectados.' },
-        { id: 'A3', etiqueta: 'Apoyo Psicológico', nivel: 'revisar', descripcion: 'Derivación para atención mental.' },
-      ]);
-    }, 500);
-  });
+  await apiClient.delete(`/alert-catalog/${id}`);
 };

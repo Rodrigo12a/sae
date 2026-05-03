@@ -46,7 +46,7 @@ function SurveySuccessContent() {
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="max-w-md w-full bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 shadow-2xl border border-slate-100 dark:border-slate-700/50 text-center"
+      className="max-w-md w-full bg-[var(--card-bg)] rounded-[2.5rem] p-8 shadow-2xl border border-[var(--border-subtle)] text-center"
     >
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
@@ -61,7 +61,7 @@ function SurveySuccessContent() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight"
+        className="text-3xl font-black text-[var(--text-primary)] mb-3 tracking-tight"
       >
         ¡Gracias, {name}!
       </motion.h1>
@@ -70,7 +70,7 @@ function SurveySuccessContent() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="text-slate-600 dark:text-slate-400 mb-10 leading-relaxed text-sm px-4"
+        className="text-[var(--text-secondary)] mb-10 leading-relaxed text-sm px-4"
       >
         Tus respuestas fueron recibidas correctamente. Esta información nos permite acompañarte mejor en tu camino académico.
       </motion.p>
@@ -82,10 +82,10 @@ function SurveySuccessContent() {
         className="text-left mb-10"
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+          <h2 className="text-xs font-black text-[var(--text-secondary)] opacity-60 uppercase tracking-[0.2em]">
             Apoyos recomendados
           </h2>
-          <div className="h-px flex-1 bg-slate-100 dark:bg-slate-700/50 ml-4" />
+          <div className="h-px flex-1 bg-[var(--border-subtle)] ml-4" />
         </div>
         
         <ResourceList resources={resources} loading={isLoading} />
@@ -98,7 +98,7 @@ function SurveySuccessContent() {
       >
         <Link 
           href="/"
-          className="group relative block w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden"
+          className="group relative block w-full py-5 bg-[var(--text-primary)] text-[var(--bg-primary)] rounded-2xl font-bold transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             Finalizar sesión
@@ -109,7 +109,7 @@ function SurveySuccessContent() {
               →
             </motion.span>
           </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-10 transition-opacity" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] opacity-0 group-hover:opacity-10 transition-opacity" />
         </Link>
         
         <p className="mt-6 text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-medium">
@@ -122,9 +122,9 @@ function SurveySuccessContent() {
 
 export default function SurveySuccessPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center p-4">
       <Suspense fallback={
-        <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 shadow-2xl h-[500px] animate-pulse"></div>
+        <div className="max-w-md w-full bg-[var(--card-bg)] rounded-[2.5rem] p-8 shadow-2xl h-[500px] animate-pulse"></div>
       }>
         <SurveySuccessContent />
       </Suspense>

@@ -28,6 +28,7 @@ const NAV_CONFIG = {
         { path: '/admin/dashboard/tutores', icon: <FiUsers />, title: 'Gestión Docente', subTitle: 'Desempeño', badge: 2 },
         { path: '/admin/dashboard/estudiantes', icon: <FiUsers />, title: 'Gestión Estudiantes', subTitle: 'Base de datos' },
         { path: '/admin/dashboard/catalogo', icon: <FiClipboard />, title: 'Catálogo Alertas', subTitle: 'Configuración' },
+        { path: '/admin/dashboard/configuracion', icon: <FiSettings />, title: 'Configuración', subTitle: 'Control de Usuarios' },
         { path: '/admin/dashboard/reportes', icon: <FiDownload />, title: 'Exportar Datos', subTitle: 'PDF / Excel' },
       ]
     },
@@ -130,7 +131,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* 2. Navegación Scrollable */}
-      <nav className="flex-1 overflow-y-auto py-8 px-4 scrollbar-thin scrollbar-thumb-white/10">
+      <nav className="flex-1 overflow-y-auto py-8 px-4 no-scrollbar">
         {sections.map((section, idx) => (
           <div key={idx} className="mb-10 last:mb-0">
             <h3 className="px-4 mb-4 text-[11px] font-black uppercase tracking-[0.2em] text-[var(--sidebar-text)]">
@@ -176,8 +177,7 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      {/* Efecto decorativo */}
-      <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+      {/* Efecto decorativo eliminado a petición del usuario */}
     </aside>
   );
 };

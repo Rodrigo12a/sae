@@ -1,3 +1,11 @@
+/**
+ * @module UserModal
+ * @epic EPICA-6 Panel Ejecutivo y Administración
+ * @hu HU002, HU023
+ * @ux UX-ADM-01 (Gestión de Usuarios)
+ * @api POST /api/users · PATCH /api/users/:id
+ */
+
 import React, { useState, useEffect } from 'react';
 import { CreateUserDto, User, UserRole } from '@/src/services/api/users';
 import { FiX, FiSave, FiUser, FiMail, FiLock, FiShield, FiHash } from 'react-icons/fi';
@@ -8,6 +16,7 @@ interface UserModalProps {
   onSave: (data: CreateUserDto) => Promise<void>;
   user?: User | null;
   isSaving: boolean;
+  lockRole?: UserRole;
 }
 
 const ROLES: { value: UserRole; label: string }[] = [
@@ -18,12 +27,12 @@ const ROLES: { value: UserRole; label: string }[] = [
   { value: 'ALUMNO', label: 'Estudiante / Alumno' },
 ];
 
-export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, user, isSaving }) => {
+export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, user, isSaving, lockRole }) => {
   const [formData, setFormData] = useState<CreateUserDto>({
     nombre: '',
     email: '',
     password: '',
-    role: 'DOCENTE',
+    role: lockRole || 'DOCENTE',
     matricula: '',
   });
 
@@ -31,7 +40,7 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
     if (user) {
       setFormData({
         nombre: user.nombre,
-        email: user.email,
+        email: user.email || '',
         role: user.role,
         matricula: user.matricula || '',
         password: '', // Password empty when editing
@@ -41,11 +50,11 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
         nombre: '',
         email: '',
         password: '',
-        role: 'DOCENTE',
+        role: lockRole || 'DOCENTE',
         matricula: '',
       });
     }
-  }, [user, isOpen]);
+  }, [user, isOpen, lockRole]);
 
   if (!isOpen) return null;
 
@@ -91,38 +100,42 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
               />
             </div>
 
-            {/* Email */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
-                <FiMail size={12} />
-                CORREO ELECTRÓNICO
-              </label>
-              <input
-                required={!user}
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-medium"
-                placeholder="ejemplo@sae.edu"
-              />
-            </div>
+            {/* Email (Hidden for students) */}
+            {formData.role !== 'ALUMNO' && (
+              <div className="space-y-1 animate-fade-in">
+                <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                  <FiMail size={12} />
+                  CORREO ELECTRÓNICO
+                </label>
+                <input
+                  required={!user}
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-medium"
+                  placeholder="ejemplo@sae.edu"
+                />
+              </div>
+            )}
 
-            {/* Role selection */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
-                <FiShield size={12} />
-                ROL ASIGNADO
-              </label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
-                className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
-              >
-                {ROLES.map((role) => (
-                  <option key={role.value} value={role.value}>{role.label}</option>
-                ))}
-              </select>
-            </div>
+            {/* Role selection (Hidden if locked) */}
+            {!lockRole && (
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                  <FiShield size={12} />
+                  ROL ASIGNADO
+                </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                >
+                  {ROLES.map((role) => (
+                    <option key={role.value} value={role.value}>{role.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Matricula (only if student) */}
             {formData.role === 'ALUMNO' && (

@@ -11,9 +11,10 @@ import { Drawer } from '@/src/components/ui/Drawer';
 import { DrillDownPanel } from '@/src/features/dashboard-admin/components/DrillDownPanel';
 import { ExportModal } from '@/src/features/dashboard-admin/components/ExportModal';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useDashboardStore } from '@/src/features/dashboard-admin/store/dashboardStore';
 import { CustomizeDashboardModal } from '@/src/features/dashboard-admin/components/CustomizeDashboardModal';
-import { FiAlertCircle, FiClock, FiRefreshCw, FiDownload, FiGrid } from 'react-icons/fi';
+import { FiAlertCircle, FiClock, FiRefreshCw, FiDownload, FiGrid, FiUsers, FiSettings, FiShield } from 'react-icons/fi';
 import { toast } from 'sonner';
 
 /**
@@ -122,7 +123,11 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Panel de Filtros */}
-      <FilterPanel filters={filters} onChange={setFilters} />
+      <FilterPanel 
+        filters={filters} 
+        onChange={setFilters} 
+        availableCareers={data?.carrerasActivas}
+      />
 
       {/* Loading State */}
       {isLoading && (
@@ -188,6 +193,43 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+            <Link href="/admin/dashboard/configuracion" className="bg-white border border-[var(--border-subtle)] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <FiUsers size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[var(--text-primary)]">Gestión de Usuarios</h3>
+                  <p className="text-xs text-[var(--text-muted)]">CRUD de docentes, alumnos y más</p>
+                </div>
+              </div>
+            </Link>
+            <Link href="/admin/dashboard/catalogo" className="bg-white border border-[var(--border-subtle)] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                  <FiSettings size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[var(--text-primary)]">Catálogo SAE</h3>
+                  <p className="text-xs text-[var(--text-muted)]">Configuración de alertas y riesgos</p>
+                </div>
+              </div>
+            </Link>
+            <Link href="/admin/dashboard/auditoria" className="bg-white border border-[var(--border-subtle)] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                  <FiShield size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[var(--text-primary)]">Seguridad y Auditoría</h3>
+                  <p className="text-xs text-[var(--text-muted)]">Logs de acceso y movimientos</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Gráfica Comparativa */}
             {isVisible('career-chart') && (
@@ -198,7 +240,11 @@ export default function AdminDashboardPage() {
                   <p className="text-[var(--text-secondary)] max-w-sm text-sm">No se encontraron registros de riesgo para los filtros seleccionados.</p>
                 </div>
               ) : (
-                <CareerRiskChart data={data.comparativaPorCarrera} onBarClick={handleBarClick} />
+                <CareerRiskChart 
+                  data={data.comparativaPorCarrera} 
+                  activeCareers={data.carrerasActivas}
+                  onBarClick={handleBarClick} 
+                />
               )
             )}
 
@@ -244,6 +290,48 @@ export default function AdminDashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Carreras y Materias Activas (New Requirement) */}
+          {isVisible('active-careers-list') && data.carrerasActivas && data.carrerasActivas.length > 0 && (
+            <div className="bg-white border border-[var(--border-subtle)] rounded-2xl p-8 shadow-sm hover:shadow-md transition-all mt-6">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-[0.1em]">Programas Vigentes y Oferta Académica</h2>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">Materias activas por cada programa académico registrado</p>
+                </div>
+                <div className="bg-indigo-50 px-3 py-1.5 rounded-lg text-indigo-600 text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                  {data.carrerasActivas.length} Carreras Activas
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {data.carrerasActivas.map((carrera) => (
+                  <div key={carrera.id} className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 hover:border-indigo-200 hover:bg-white transition-all group">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xs shadow-lg shadow-indigo-100">
+                        {carrera.nombre.substring(0, 2).toUpperCase()}
+                      </div>
+                      <h3 className="font-bold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors leading-tight">
+                        {carrera.nombre}
+                      </h3>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1.5">
+                      {carrera.materias && carrera.materias.length > 0 ? (
+                        carrera.materias.map((materia, idx) => (
+                          <span key={idx} className="bg-white border border-slate-200 text-slate-600 px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm">
+                            {materia}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[10px] text-slate-400 italic">No hay materias registradas</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </>
       )}
 

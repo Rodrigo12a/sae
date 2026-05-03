@@ -1,20 +1,21 @@
-/**
- * @module MedicoDashboardPage
- * @epic EPICA-4 Módulo Médico con Privacidad Diferencial
- * @hu HU012 — Seguimiento de casos derivados
- * @description Dashboard principal para el rol médico con gestión de derivaciones pendientes.
- */
+'use client';
 
 import React from 'react';
-import { FiPieChart, FiUsers, FiAlertCircle, FiArrowRight, FiActivity } from 'react-icons/fi';
+import { FiPieChart, FiUsers, FiAlertCircle, FiArrowRight, FiActivity, FiExternalLink } from 'react-icons/fi';
 import Link from 'next/link';
+import { usePendingReferrals } from '@/src/features/derivaciones/hooks/usePendingReferrals';
+import { Drawer } from '@/src/components/ui/Drawer';
+import { ReferralContextPanel } from '@/src/features/medico/components/ReferralContextPanel/ReferralContextPanel';
+import { PendingReferral } from '@/src/features/derivaciones/types';
+
 
 export default function MedicoDashboardPage() {
-  // Mock de derivaciones pendientes
-  const derivacionesPendientes = [
-    { id: 'D-102', nombre: 'Juan Pérez', motivo: 'Reporte recurrente de fatiga', tutor: 'Rodrigo Osorio', fecha: '2026-04-26', prioridad: 'alta' },
-    { id: 'D-105', nombre: 'Ana López', motivo: 'Desmayo en aula', tutor: 'Karla Gómez', fecha: '2026-04-27', prioridad: 'crítica' },
-  ];
+  const { data: allReferrals, isLoading } = usePendingReferrals();
+  const [selectedReferral, setSelectedReferral] = React.useState<PendingReferral | null>(null);
+  
+  // Filtramos las derivaciones que corresponden al departamento médico
+  const derivacionesPendientes = allReferrals?.filter(d => d.department === 'medical') || [];
+
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8 animate-fade-in">
@@ -65,40 +66,56 @@ export default function MedicoDashboardPage() {
           </div>
 
           <div className="bg-white border border-[var(--border-subtle)] rounded-2xl shadow-sm overflow-hidden">
-            <div className="divide-y divide-gray-100">
-              {derivacionesPendientes.map((d) => (
-                <div key={d.id} className="p-5 hover:bg-gray-50/50 transition-all flex items-center justify-between group">
-                  <div className="flex items-start gap-4">
-                    <div className={`mt-1 w-2 h-2 rounded-full ${d.prioridad === 'crítica' ? 'bg-red-500 animate-pulse' : 'bg-orange-500'}`} />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-[var(--text-primary)]">{d.nombre}</h3>
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter ${
-                          d.prioridad === 'crítica' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {d.prioridad}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-0.5">{d.motivo}</p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
-                        <span className="flex items-center gap-1 font-medium"><FiUsers /> Tutor: {d.tutor}</span>
-                        <span className="flex items-center gap-1"><FiActivity /> {d.fecha}</span>
+            {isLoading ? (
+              <div className="p-12 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-500">Cargando derivaciones...</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {derivacionesPendientes.map((d) => (
+                  <div key={d.id} className="p-5 hover:bg-gray-50/50 transition-all flex items-center justify-between group">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1 w-2 h-2 rounded-full bg-orange-500" />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-[var(--text-primary)]">{d.studentName}</h3>
+                          {d.aiValidation?.isAutoReport && (
+                            <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-md text-[10px] font-black uppercase tracking-tighter">
+                              Crítica
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 mt-0.5">{d.descripcionObservable}</p>
+                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                          <span className="flex items-center gap-1 font-medium"><FiUsers /> Estudiante ID: {d.studentId}</span>
+                          <span className="flex items-center gap-1"><FiActivity /> {new Date(d.createdAt).toLocaleDateString()}</span>
+                        </div>
                       </div>
                     </div>
+                    <button 
+                      onClick={() => setSelectedReferral(d)}
+                      className="p-2 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all"
+                      title="Ver contexto de derivación"
+                    >
+                      <FiArrowRight className="w-5 h-5" />
+                    </button>
+                    <Link 
+                      href={`/medico/estudiante/${d.studentId}`}
+                      className="p-2 rounded-lg bg-gray-50 text-gray-400 hover:bg-blue-500 hover:text-white transition-all ml-2"
+                      title="Ir al expediente completo"
+                    >
+                      <FiExternalLink className="w-5 h-5" />
+                    </Link>
+
                   </div>
-                  <Link 
-                    href={`/medico/estudiante/${d.id}`}
-                    className="p-2 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all"
-                  >
-                    <FiArrowRight className="w-5 h-5" />
-                  </Link>
-                </div>
-              ))}
-            </div>
-            {derivacionesPendientes.length === 0 && (
-              <div className="p-12 text-center">
-                <FiUsers className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-500 font-medium">No hay derivaciones pendientes hoy.</p>
+                ))}
+                {derivacionesPendientes.length === 0 && (
+                  <div className="p-12 text-center">
+                    <FiUsers className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                    <p className="text-gray-500 font-medium">No hay derivaciones pendientes hoy.</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -146,6 +163,47 @@ export default function MedicoDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Sidebar de Contexto (Drawer) */}
+      <Drawer
+        isOpen={!!selectedReferral}
+        onClose={() => setSelectedReferral(null)}
+        title="Detalles del Caso Especial"
+      >
+        {selectedReferral && (
+          <div className="space-y-6">
+            <ReferralContextPanel 
+              derivation={{
+                id: selectedReferral.id,
+                studentName: selectedReferral.studentName,
+                tutorName: 'Tutor Institucional', // Idealmente vendría del API
+                fecha: new Date(selectedReferral.createdAt).toLocaleDateString(),
+                motivo: selectedReferral.descripcionObservable,
+                prioridad: selectedReferral.aiValidation?.isAutoReport ? 'crítica' : 'alta'
+              }} 
+            />
+            
+            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-start gap-4">
+              <div className="p-2 bg-blue-600 text-white rounded-lg">
+                <FiActivity />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-blue-900">Acción Requerida</h4>
+                <p className="text-xs text-blue-700 mt-1">
+                  Revisa los antecedentes y realiza la evaluación clínica en la sección de expedientes.
+                </p>
+                <Link 
+                  href={`/medico/estudiante/${selectedReferral.studentId}`}
+                  className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-all"
+                >
+                  Abrir Expediente Completo
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
+
   );
 }

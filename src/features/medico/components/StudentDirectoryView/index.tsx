@@ -9,22 +9,33 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiSearch, FiUsers, FiFilter, FiExternalLink, FiPlus, FiActivity } from 'react-icons/fi';
 import { useGroupStudents } from '../../hooks/useGroupStudents';
 import { Semaforo } from '@/src/components/ui/Semaforo';
 import Link from 'next/link';
 import { SkeletonCard } from '@/src/components/ui/SkeletonCard';
+import { medicalService } from '@/src/services/api/medical';
+import { FiSearch, FiUsers, FiFilter, FiExternalLink, FiActivity, FiCalendar, FiAlertCircle } from 'react-icons/fi';
+import { usePendingReferrals } from '@/src/features/derivaciones/hooks/usePendingReferrals';
+import { Drawer } from '@/src/components/ui/Drawer';
+import { ReferralContextPanel } from '../ReferralContextPanel/ReferralContextPanel';
+import { PendingReferral } from '@/src/features/derivaciones/types';
 
 export function StudentDirectoryView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('G501'); // Mock group for demo
+  const [selectedReferral, setSelectedReferral] = useState<PendingReferral | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   const { data: students, isLoading, error } = useGroupStudents(selectedGroup);
+  const { data: allReferrals } = usePendingReferrals();
+  
+  const medicalReferrals = allReferrals?.filter(d => d.department === 'medical') || [];
 
-  const filteredStudents = students?.filter(s => 
+  const filteredStudents = students?.filter(s =>
     s.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.matricula.includes(searchTerm)
   );
+
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
@@ -47,11 +58,11 @@ export function StudentDirectoryView() {
         </div>
 
         <div className="flex gap-3 w-full md:w-auto">
-          <Link 
+          <Link
             href="/medico/jornada"
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-bold rounded-xl transition-all shadow-lg shadow-[var(--color-primary)]/20"
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[var(--text-primary)] font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm"
           >
-            <FiPlus /> Nueva Jornada
+            <FiCalendar /> Nueva Jornada
           </Link>
         </div>
       </div>
@@ -68,7 +79,7 @@ export function StudentDirectoryView() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="relative">
           <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <select
@@ -135,18 +146,35 @@ export function StudentDirectoryView() {
                       )}
                     </td>
                     <td className="px-8 py-5">
-                      <Semaforo 
-                        estado={student.selectedConditions.length > 0 ? 'revisar' : 'verde'} 
-                        etiqueta={student.selectedConditions.length > 0 ? 'Bajo revisión' : 'Sin hallazgos'}
-                        compact
-                      />
+                      <div className="flex flex-col gap-2">
+                        <Semaforo
+                          estado={student.selectedConditions.length > 0 ? 'revisar' : 'verde'}
+                          etiqueta={student.selectedConditions.length > 0 ? 'Bajo revisión' : 'Sin hallazgos'}
+                          compact
+                        />
+                        {medicalReferrals.find(r => r.studentId === student.studentId) && (
+                          <button 
+                            onClick={() => {
+                              const ref = medicalReferrals.find(r => r.studentId === student.studentId);
+                              if (ref) {
+                                setSelectedReferral(ref);
+                                setIsDrawerOpen(true);
+                              }
+                            }}
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[10px] font-black uppercase tracking-wider hover:bg-indigo-100 transition-all border border-indigo-100 w-fit"
+                          >
+                            <FiAlertCircle /> Caso Derivado
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="px-8 py-5 text-right">
                       <Link
                         href={`/medico/estudiante/${student.studentId}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
+                        title="Ver Expediente"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-500 hover:text-white transition-all shadow-sm font-bold text-xs"
                       >
-                        Ver Detalles <FiExternalLink />
+                        <FiExternalLink /> Ver Detalles
                       </Link>
                     </td>
                   </tr>
@@ -186,6 +214,49 @@ export function StudentDirectoryView() {
           <p className="text-2xl font-black text-[var(--color-info)]">Hoy</p>
         </div>
       </div>
+
+
+
+      {/* Sidebar de Contexto (Drawer) */}
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title="Contexto de Derivación Especial"
+      >
+        {selectedReferral && (
+          <div className="space-y-6">
+            <ReferralContextPanel 
+              derivation={{
+                id: selectedReferral.id,
+                studentName: selectedReferral.studentName,
+                tutorName: 'Tutor Institucional',
+                fecha: new Date(selectedReferral.createdAt).toLocaleDateString(),
+                motivo: selectedReferral.descripcionObservable,
+                prioridad: selectedReferral.aiValidation?.isAutoReport ? 'crítica' : 'alta'
+              }} 
+            />
+            
+            <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-start gap-4">
+              <div className="p-2 bg-indigo-600 text-white rounded-lg">
+                <FiActivity />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-indigo-900">Seguimiento Clínico</h4>
+                <p className="text-xs text-indigo-700 mt-1">
+                  Este estudiante ha sido derivado para valoración médica. Revisa el motivo y registra tus hallazgos.
+                </p>
+                <Link 
+                  href={`/medico/estudiante/${selectedReferral.studentId}`}
+                  className="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all"
+                >
+                  Ir al Expediente Completo
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
+
   );
 }

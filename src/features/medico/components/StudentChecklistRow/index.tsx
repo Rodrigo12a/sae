@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { BulkHealthEntry, MedicalCondition } from '../../types';
 import { ConditionSelector } from '../ConditionSelector';
-import { FiAlertCircle } from 'react-icons/fi';
+import { FiAlertCircle, FiArrowRight } from 'react-icons/fi';
 import { ExistingRecordModal } from '../ExistingRecordModal';
+import { PendingReferral } from '@/src/features/derivaciones/types';
 
 /**
  * @module StudentChecklistRow
@@ -17,10 +18,12 @@ interface StudentChecklistRowProps {
   entry: BulkHealthEntry;
   conditions: MedicalCondition[];
   onChange: (studentId: string, conditionIds: string[]) => void;
+  onShowContext?: (referral: PendingReferral) => void;
+  referral?: PendingReferral;
   disabled?: boolean;
 }
 
-export function StudentChecklistRow({ entry, conditions, onChange, disabled }: StudentChecklistRowProps) {
+export function StudentChecklistRow({ entry, conditions, onChange, onShowContext, referral, disabled }: StudentChecklistRowProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSelection, setPendingSelection] = useState<string[] | null>(null);
   const [activeCategory, setActiveCategory] = useState<MedicalCondition['category'] | 'todas'>('todas');
@@ -61,9 +64,20 @@ export function StudentChecklistRow({ entry, conditions, onChange, disabled }: S
             {entry.existingRecord && (
               <div className="inline-flex items-center gap-1 mt-2 text-xs font-black text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
                 <FiAlertCircle className="w-3 h-3" />
-                EXPEDIENTE PREVIO DETECTADO
+                EXPEDIENTE PREVIO
               </div>
             )}
+            {referral && (
+              <button 
+                type="button"
+                onClick={() => onShowContext?.(referral)}
+                className="inline-flex items-center gap-1.5 mt-2 ml-2 text-xs font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+              >
+                <FiArrowRight className="w-3 h-3" />
+                CASO DERIVADO
+              </button>
+            )}
+
           </div>
 
           <div className="flex flex-wrap gap-3">

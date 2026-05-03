@@ -1,3 +1,11 @@
+/**
+ * @module UserManagementContainer
+ * @epic EPICA-6 Panel Ejecutivo y Administración
+ * @hu HU002, HU023
+ * @ux UX-ADM-01 (Gestión de Usuarios)
+ * @api GET /api/users · POST /api/users · PATCH /api/users/:id · DELETE /api/users/:id
+ */
+
 import React, { useState, useEffect } from 'react';
 import { User, userService, CreateUserDto, UserRole } from '@/src/services/api/users';
 import { UserTable } from './UserTable';
@@ -42,7 +50,7 @@ export const UserManagementContainer: React.FC = () => {
     if (searchTerm) {
       result = result.filter(u => 
         u.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.matricula?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -64,10 +72,10 @@ export const UserManagementContainer: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (uid: string) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
       try {
-        await userService.delete(id);
+        await userService.delete(uid);
         toast.success('Usuario eliminado correctamente');
         loadUsers();
       } catch (error) {
@@ -80,7 +88,7 @@ export const UserManagementContainer: React.FC = () => {
     setIsSaving(true);
     try {
       if (selectedUser) {
-        await userService.update(selectedUser.id, data);
+        await userService.update(selectedUser.uid, data);
         toast.success('Usuario actualizado correctamente');
       } else {
         await userService.create(data);

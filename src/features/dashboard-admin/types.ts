@@ -16,6 +16,7 @@ export interface AdminKPIs {
   alertasAtendidas: number;
   alertasIgnoradas: number;
   comparativaPorCarrera: CareerRiskComparison[];
+  carrerasActivas: { id: string; nombre: string; materias: string[] }[];
   dataFreshness: string;        // ISO timestamp — para badge de frescura
   latencyMs: number;            // Si > 300000ms (5min), badge de advertencia
 }

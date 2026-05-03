@@ -41,7 +41,11 @@ export default function DrilldownPage() {
         </p>
       </div>
 
-      <FilterPanel filters={filters} onChange={setFilters} />
+      <FilterPanel 
+        filters={filters} 
+        onChange={setFilters} 
+        availableCareers={data?.carrerasActivas}
+      />
 
       {isLoading && (
         <div className="grid grid-cols-1 gap-6">

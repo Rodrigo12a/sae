@@ -48,7 +48,11 @@ export default function CarrerasPage() {
         </p>
       </div>
 
-      <FilterPanel filters={filters} onChange={setFilters} />
+      <FilterPanel 
+        filters={filters} 
+        onChange={setFilters} 
+        availableCareers={data?.carrerasActivas}
+      />
 
       {isLoading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -88,7 +92,11 @@ export default function CarrerasPage() {
               <p className="text-[var(--text-secondary)] text-sm">No se encontraron registros con los filtros seleccionados.</p>
             </div>
           ) : (
-            <CareerRiskChart data={data.comparativaPorCarrera} onBarClick={handleBarClick} />
+            <CareerRiskChart 
+              data={data.comparativaPorCarrera} 
+              activeCareers={data.carrerasActivas}
+              onBarClick={handleBarClick} 
+            />
           )}
         </>
       )}
