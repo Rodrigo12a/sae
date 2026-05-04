@@ -52,6 +52,10 @@ export default function AdminDashboardPage() {
   const { data, isLoading, isError, refetch } = useAdminKPIs(filters);
 
   const handleBarClick = (careerId: string) => {
+    if (careerId === 'sin-carrera') {
+      toast.error('No hay detalles disponibles para estudiantes sin carrera asignada.');
+      return;
+    }
     setDrillDownCareer(careerId);
     setIsDrawerOpen(true);
   };

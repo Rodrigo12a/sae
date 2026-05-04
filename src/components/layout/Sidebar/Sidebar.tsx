@@ -20,7 +20,7 @@ const NAV_CONFIG = {
       section: 'Principal', items: [
         { path: '/admin/dashboard', icon: <FiPieChart />, title: 'Dashboard Ejecutivo', subTitle: 'Vista Global' },
         { path: '/admin/dashboard/carreras', icon: <FiTrendingUp />, title: 'KPIs por Carrera', subTitle: 'Rendimiento' },
-        { path: '/admin/dashboard/drilldown', icon: <FiLayers />, title: 'Drill-down Grupos', subTitle: 'Anomalías' },
+        { path: '/admin/dashboard/drilldown', icon: <FiLayers />, title: 'Detalle de Grupos', subTitle: 'Anomalías' },
       ]
     },
     {

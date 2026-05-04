@@ -32,15 +32,19 @@ export const DrillDownPanel: React.FC<DrillDownPanelProps> = ({ request, onNavig
 
   if (isError) {
     return (
-      <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
-        <div className="flex items-center gap-2 mb-2">
-          <span>⚠️</span>
-          <h3 className="font-semibold">Error al cargar el detalle</h3>
+      <div className="p-6 bg-red-50 text-red-700 rounded-2xl border border-red-100 flex flex-col items-center text-center">
+        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 mb-4">
+          <span className="text-xl">⚠️</span>
         </div>
-        <p className="text-sm mb-4">Hubo un problema al recuperar los estudiantes. Intenta nuevamente.</p>
+        <h3 className="font-bold text-lg mb-1 text-red-800">Error al cargar el detalle</h3>
+        <p className="text-sm mb-6 text-red-600 max-w-xs">
+          {request.careerId === 'sin-carrera' 
+            ? 'No se pueden recuperar detalles para estudiantes sin carrera asignada.' 
+            : 'Hubo un problema al recuperar los estudiantes. Intenta nuevamente.'}
+        </p>
         <button
           onClick={() => refetch()}
-          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded font-medium text-sm transition-colors"
+          className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-all shadow-sm"
         >
           Reintentar
         </button>

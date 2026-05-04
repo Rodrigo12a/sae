@@ -28,7 +28,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onChange, ava
           className="w-full bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-lg p-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
         >
           <option value="">Todas las carreras</option>
-          {availableCareers?.map((carrera) => (
+          {availableCareers?.filter(c => c.id !== 'sin-carrera').map((carrera) => (
             <option key={carrera.id} value={carrera.id}>
               {carrera.nombre}
             </option>

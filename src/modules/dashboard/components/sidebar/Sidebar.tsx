@@ -25,7 +25,7 @@ const principalItems = [
   {
     path: '/dashboard/drilldown',
     icon: <span>🔍</span>,
-    title: 'Drill-down grupos',
+    title: 'Análisis por grupos',
     subTitle: 'Detalle por grupo'
   },
 ];

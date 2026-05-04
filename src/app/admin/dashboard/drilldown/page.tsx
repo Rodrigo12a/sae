@@ -28,9 +28,12 @@ export default function DrilldownPage() {
   
   // Determinar qué carrera mostrar en el detalle
   // 1. Si hay una carrera seleccionada en el FilterPanel, esa manda.
-  // 2. Si no, pero hay datos de comparativa, usamos la primera de la lista.
+  // 2. Si no, pero hay datos de comparativa (excluyendo "sin-carrera"), usamos la primera de la lista.
   // 3. Si no hay nada, string vacío.
-  const activeDrillDownId = filters.careerId || (careers.length > 0 ? careers[0].careerId : '');
+  const validCareers = careers.filter(c => c.careerId && c.careerId !== 'sin-carrera');
+  const activeDrillDownId = (filters.careerId && filters.careerId !== 'sin-carrera') 
+    ? filters.careerId 
+    : (validCareers.length > 0 ? validCareers[0].careerId : '');
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
@@ -40,7 +43,7 @@ export default function DrilldownPage() {
           <FiLayers />
           <span>Detalle por grupo</span>
         </div>
-        <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Drill-down Grupos</h1>
+        <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Análisis por Grupos</h1>
         <p className="text-sm text-[var(--text-muted)] font-medium mt-1">
           Vista detallada de anomalías por grupo y sección académica.
         </p>
@@ -82,7 +85,7 @@ export default function DrilldownPage() {
                 >
                   Todas (KPIs)
                 </button>
-                {careers.map((c) => (
+                {careers.filter(c => c.careerId !== 'sin-carrera').map((c) => (
                   <button
                     key={c.careerId}
                     onClick={() => setFilters({ ...filters, careerId: c.careerId })}
