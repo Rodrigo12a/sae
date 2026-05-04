@@ -15,6 +15,8 @@ export interface AdminKPIs {
   riesgoGlobal: number;         // Índice 0-100
   alertasAtendidas: number;
   alertasIgnoradas: number;
+  alumnosSinEncuesta: number;
+  estudiantesSinEncuesta: { id: string; name: string; career: string }[];
   comparativaPorCarrera: CareerRiskComparison[];
   carrerasActivas: { id: string; nombre: string; materias: string[] }[];
   dataFreshness: string;        // ISO timestamp — para badge de frescura

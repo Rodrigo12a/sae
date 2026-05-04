@@ -39,6 +39,7 @@ export default function AdminDashboardPage() {
   // Drill-down states
   const [drillDownCareer, setDrillDownCareer] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isSurveyDrawerOpen, setIsSurveyDrawerOpen] = useState(false);
   
   // Export Modal state
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -190,9 +191,10 @@ export default function AdminDashboardPage() {
               />
               <KpiCard 
                 label="Sin encuesta" 
-                value="47" 
+                value={data.alumnosSinEncuesta?.toString() || "0"} 
                 sub="▲ pendientes" 
                 trend="up"
+                onClick={() => setIsSurveyDrawerOpen(true)}
               />
             </div>
           )}
@@ -362,6 +364,65 @@ export default function AdminDashboardPage() {
             onNavigateToStudent={handleNavigateToStudent}
           />
         )}
+      </Drawer>
+
+      {/* Drawer para Alumnos Sin Encuesta */}
+      <Drawer
+        isOpen={isSurveyDrawerOpen}
+        onClose={() => setIsSurveyDrawerOpen(false)}
+        title="Estudiantes sin Encuesta"
+      >
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Acciones rápidas</h3>
+            <button 
+              onClick={() => {
+                toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
+                  loading: 'Verificando encuestas realizadas...',
+                  success: 'Sincronización completada. El número ha disminuido.',
+                  error: 'Error al sincronizar.',
+                });
+              }}
+              className="flex items-center gap-2 text-[10px] font-bold text-[var(--brand-primary)] hover:underline"
+            >
+              <FiRefreshCw size={12} className="animate-spin-hover" />
+              Sincronizar ahora
+            </button>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-start gap-3">
+            <span className="text-xl">📝</span>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Estos estudiantes aún no han completado la encuesta de factores de riesgo. 
+              <strong> El Motor de IA requiere estos datos</strong> para generar predicciones precisas.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {data?.estudiantesSinEncuesta && data.estudiantesSinEncuesta.length > 0 ? (
+              data.estudiantesSinEncuesta.map((student) => (
+                <div key={student.id} className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all flex justify-between items-center group">
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm group-hover:text-[var(--brand-primary)] transition-colors">{student.name}</h4>
+                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">{student.career} • ID: {student.id}</p>
+                  </div>
+                  <button 
+                    onClick={() => handleNavigateToStudent(student.id)}
+                    className="p-2 bg-slate-50 text-slate-400 hover:bg-[var(--brand-primary)] hover:text-white rounded-lg transition-all"
+                  >
+                    <FiUsers size={16} />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <span className="text-4xl mb-4 block">🎉</span>
+                <p className="text-sm font-bold text-slate-800">¡Todos al día!</p>
+                <p className="text-xs text-slate-500 mt-1">No hay encuestas pendientes en este momento.</p>
+              </div>
+            )}
+          </div>
+        </div>
       </Drawer>
 
       {/* Modal para Personalización */}

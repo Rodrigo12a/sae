@@ -13,11 +13,15 @@ interface KpiCardProps {
   value: string;
   sub: string;
   trend?: 'up' | 'down';
+  onClick?: () => void;
 }
 
-export const KpiCard: React.FC<KpiCardProps> = ({ label, value, sub, trend }) => {
+export const KpiCard: React.FC<KpiCardProps> = ({ label, value, sub, trend, onClick }) => {
   return (
-    <div className="bg-white border border-[var(--border-subtle)] rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 group hover:-translate-y-1">
+    <div 
+      onClick={onClick}
+      className={`bg-white border border-[var(--border-subtle)] rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 relative overflow-hidden ${onClick ? 'cursor-pointer' : ''}`}
+    >
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] leading-tight">
           {label}
