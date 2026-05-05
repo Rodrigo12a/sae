@@ -11,27 +11,27 @@ export default function MedicoLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RoleGuard resource="student.health.clinical" action="write">
-      <div className="flex h-screen w-full bg-[var(--bg-main)] overflow-hidden">
+    <div className="flex h-screen w-full bg-[var(--bg-main)] overflow-hidden">
+      
+      {/* Sidebar con navegación por rol */}
+      <Sidebar />
+
+      {/* Área Principal de Contenido */}
+      <div className="flex flex-col flex-1 min-w-0">
         
-        {/* Sidebar con navegación por rol */}
-        <Sidebar />
+        {/* Navbar con menú de usuario */}
+        <Navbar />
 
-        {/* Área Principal de Contenido */}
-        <div className="flex flex-col flex-1 min-w-0">
-          
-          {/* Navbar con menú de usuario */}
-          <Navbar />
-
-          {/* Zona de Renderizado de Páginas */}
+        {/* Zona de Renderizado de Páginas Protegida */}
+        <RoleGuard resource="student.health.clinical" action="write">
           <main className="flex-1 overflow-y-auto overflow-x-hidden p-8 animate-fade-in">
             <div className="max-w-[1600px] mx-auto">
               {children}
             </div>
           </main>
+        </RoleGuard>
 
-        </div>
       </div>
-    </RoleGuard>
+    </div>
   );
 }

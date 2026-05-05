@@ -7,7 +7,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { FiBell, FiChevronDown, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
+import { useUIStore } from '@/src/store/uiStore';
+import { FiBell, FiChevronDown, FiUser, FiSettings, FiLogOut, FiMenu } from 'react-icons/fi';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 
@@ -15,6 +16,7 @@ export const Navbar: React.FC = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { toggleSidebarMobile } = useUIStore();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -27,10 +29,17 @@ export const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <header className="h-[72px] bg-white border-b border-[var(--border-subtle)] flex items-center justify-between px-8 z-30 shadow-sm">
-      {/* Lado Izquierdo: Contexto de Página */}
+    <header className="h-[72px] bg-white border-b border-[var(--border-subtle)] flex items-center justify-between px-4 sm:px-8 z-30 shadow-sm">
+      {/* Lado Izquierdo: Botón Mobile + Contexto */}
       <div className="flex items-center gap-4">
-        <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
+        <button 
+          onClick={toggleSidebarMobile}
+          className="lg:hidden relative z-50 p-2 text-slate-600 hover:bg-slate-100 active:bg-slate-200 rounded-lg transition-all"
+          aria-label="Abrir menú"
+        >
+          <FiMenu size={24} />
+        </button>
+        <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight hidden xs:block">
           Panel de Gestión
         </h2>
       </div>

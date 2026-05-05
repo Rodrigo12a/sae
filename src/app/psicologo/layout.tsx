@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sidebar } from '@/src/components/layout/Sidebar/Sidebar';
+import { Navbar } from '@/src/components/layout/Navbar/Navbar';
 import { RoleGuard } from '@/src/components/ui/RoleGuard';
 
 export default function PsicologoLayout({
@@ -8,20 +9,30 @@ export default function PsicologoLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RoleGuard resource="referral.accept" action="write">
-      <div className="flex h-screen bg-gray-50 overflow-hidden">
-        {/* Sidebar de navegación del Psicólogo */}
-        <Sidebar />
+    <div className="flex h-screen w-full bg-[var(--bg-main)] overflow-hidden">
+      
+      {/* Sidebar de navegación del Psicólogo */}
+      <Sidebar />
 
-        {/* Contenido principal */}
-        <main
-          id="main-content"
-          className="flex-1 overflow-y-auto"
-          aria-label="Contenido principal"
-        >
-          {children}
-        </main>
+      {/* Área Principal de Contenido */}
+      <div className="flex flex-col flex-1 min-w-0">
+        
+        {/* Navbar con menú de usuario */}
+        <Navbar />
+
+        {/* Zona de Renderizado de Páginas Protegida */}
+        <RoleGuard resource="referral.accept" action="write">
+          <main
+            id="main-content"
+            className="flex-1 overflow-y-auto p-8 animate-fade-in"
+            aria-label="Contenido principal"
+          >
+            <div className="max-w-[1600px] mx-auto">
+              {children}
+            </div>
+          </main>
+        </RoleGuard>
       </div>
-    </RoleGuard>
+    </div>
   );
 }

@@ -1,19 +1,16 @@
-/**
- * @module Sidebar
- * @description Barra lateral de navegación principal con control de acceso por rol.
- */
-
 'use client';
 
 import React from 'react';
 import Image from 'next/image';
-import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import { useUIStore } from '@/src/store/uiStore';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiLogOut, FiPieChart, FiTrendingUp, FiLayers, FiUsers, FiClipboard, FiDownload, FiShield, FiSettings, FiInbox, FiBook, FiCalendar, FiActivity, FiUser, FiMenu, FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi';
 import { SidebarMenuItem } from './navigation/SidebarMenuItem';
-import { FiLogOut, FiPieChart, FiTrendingUp, FiLayers, FiUsers, FiClipboard, FiDownload, FiShield, FiSettings, FiInbox, FiBook, FiCalendar, FiActivity, FiUser } from 'react-icons/fi';
 import { ROLE_ALIAS_MAP } from '@/src/lib/rbac.config';
 
-// Configuración de navegación por rol
+// Configuración de navegación por rol (keeps the same)
 const NAV_CONFIG = {
   administrador: [
     {
@@ -96,7 +93,6 @@ const NAV_CONFIG = {
   ],
 };
 
-/** Mapa de roles a prefijos de ruta (carpetas en app/) */
 const ROLE_PATH_MAP: Record<string, string> = {
   administrador: 'admin',
   tutor: 'tutor',
@@ -107,77 +103,176 @@ const ROLE_PATH_MAP: Record<string, string> = {
 
 export const Sidebar: React.FC = () => {
   const { data: session } = useSession();
+  const { 
+    isSidebarCollapsed, 
+    isSidebarOpen, 
+    toggleSidebarCollapse, 
+    closeSidebarMobile 
+  } = useUIStore();
 
   const rawRole = session?.user?.role as string | undefined;
   const role = (rawRole ? ROLE_ALIAS_MAP[rawRole.toLowerCase()] : 'tutor') as keyof typeof NAV_CONFIG;
   const sections = NAV_CONFIG[role] || NAV_CONFIG.tutor;
   const pathPrefix = ROLE_PATH_MAP[role] || 'tutor';
 
-  return (
-    <aside className="w-[280px] h-screen bg-[var(--sidebar-bg)] text-white flex flex-col border-r border-white/5 z-40 relative group">
-      {/* 1. Header con Logo */}
-      <div className="px-8 py-10 flex flex-col items-center border-b border-white/5">
-        <Image
-          src="/iconos/isotipo-blanco.png"
-          alt="SAE Logo"
-          width={60}
-          height={60}
-          className="mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-        />
-        <div className="text-center">
-          <p className="text-lg font-black tracking-widest text-[var(--sidebar-accent)] leading-none">SAE</p>
-          <p className="text-[10px] font-bold text-[var(--sidebar-text)] mt-1 uppercase tracking-tighter">Guardián Institucional</p>
+  const sidebarVariants = {
+    expanded: { width: 280 },
+    collapsed: { width: 80 }
+  };
+
+  const renderSidebarContent = (isCollapsed: boolean) => (
+    <div className="h-full flex flex-col bg-[var(--sidebar-bg)] text-white border-r border-white/5 relative">
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* 1. Header con Logo */}
+        <div className={`px-4 py-8 flex flex-col items-center border-b border-white/5 transition-all duration-300 ${isCollapsed ? 'py-6' : 'py-10'}`}>
+          <AnimatePresence mode="wait">
+            {!isCollapsed ? (
+              <motion.div 
+                key="full-logo"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center"
+              >
+                <p className="text-2xl font-black tracking-widest text-[var(--sidebar-accent)] leading-none">SAE</p>
+                <p className="text-[9px] font-bold text-[var(--sidebar-text)] mt-2 uppercase tracking-tight">Sistema de Acompañamiento Estudiantil</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="short-logo"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--sidebar-accent)] to-indigo-600 flex items-center justify-center shadow-lg shadow-[var(--sidebar-accent)]/20"
+              >
+                <span className="font-black text-xl italic">S</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* 2. Navegación Scrollable */}
+        <nav className="flex-1 overflow-y-auto py-6 px-3 no-scrollbar space-y-8">
+          {sections.map((section, idx) => (
+            <div key={idx}>
+              {!isCollapsed && (
+                <motion.h3 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="px-4 mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--sidebar-text)] opacity-50"
+                >
+                  {section.section}
+                </motion.h3>
+              )}
+              <div className="space-y-1">
+                {section.items.map((item, idy) => (
+                  <SidebarMenuItem key={idy} {...item} isCollapsed={isCollapsed} />
+                ))}
+              </div>
+              {isCollapsed && idx < sections.length - 1 && (
+                <div className="mx-auto w-8 h-px bg-white/5 my-4" />
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* 3. Footer / User & Logout */}
+        <div className={`p-4 border-t border-white/5 bg-black/20 space-y-3 transition-all duration-300`}>
+          <Link
+            href={`/${pathPrefix}/profile`}
+            className={`flex items-center gap-3 p-2.5 rounded-xl bg-[var(--sidebar-hover-bg)] hover:bg-white/10 transition-all group ${isCollapsed ? 'justify-center' : ''}`}
+          >
+            <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/10 bg-slate-800 flex-shrink-0">
+              <Image
+                src={session?.user?.image || "/imagenes/profile.jpg"}
+                alt="Avatar"
+                width={36}
+                height={36}
+                className="object-cover w-full h-full"
+              />
+            </div>
+            {!isCollapsed && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex-1 min-w-0"
+              >
+                <p className="text-[13px] font-bold text-[var(--sidebar-text-active)] truncate">{session?.user?.name || 'Usuario SAE'}</p>
+                <p className="text-[9px] font-medium text-[var(--sidebar-text)] uppercase tracking-wider">{role}</p>
+              </motion.div>
+            )}
+          </Link>
+
+          <button
+            onClick={() => signOut({ callbackUrl: '/auth/login' })}
+            className={`w-full flex items-center gap-3 py-2.5 rounded-xl bg-transparent hover:bg-red-500/10 text-[var(--sidebar-text)] hover:text-red-500 transition-all font-bold text-[13px] group ${isCollapsed ? 'justify-center' : 'px-3'}`}
+            aria-label="Cerrar Sesión"
+          >
+            <FiLogOut className={`text-lg transition-transform group-hover:-translate-x-1 flex-shrink-0`} />
+            {!isCollapsed && <span className="whitespace-nowrap">Cerrar Sesión</span>}
+          </button>
         </div>
       </div>
 
-      {/* 2. Navegación Scrollable */}
-      <nav className="flex-1 overflow-y-auto py-8 px-4 no-scrollbar">
-        {sections.map((section, idx) => (
-          <div key={idx} className="mb-10 last:mb-0">
-            <h3 className="px-4 mb-4 text-[11px] font-black uppercase tracking-[0.2em] text-[var(--sidebar-text)]">
-              {section.section}
-            </h3>
-            <div className="space-y-1.5">
-              {section.items.map((item, idy) => (
-                <SidebarMenuItem key={idy} {...item} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </nav>
+      {/* Botón de Toggle (Solo Desktop) */}
+      <button
+        onClick={toggleSidebarCollapse}
+        className="hidden lg:flex absolute -right-4 top-10 w-8 h-8 bg-[var(--sidebar-accent)] text-white rounded-full items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:scale-110 transition-all z-[100] border-4 border-[var(--bg-main)] group"
+        aria-label={isCollapsed ? "Expandir Sidebar" : "Colapsar Sidebar"}
+      >
+        {isCollapsed ? (
+          <FiChevronRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+        ) : (
+          <FiChevronLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
+        )}
+      </button>
+    </div>
+  );
 
-      {/* 3. Footer / User & Logout */}
-      <div className="p-6 border-t border-white/5 bg-black/20 space-y-4">
-        <Link
-          href={`/${pathPrefix}/profile`}
-          className="flex items-center gap-3 p-3 rounded-xl bg-[var(--sidebar-hover-bg)] hover:bg-white/10 transition-all group"
-        >
-          <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 bg-slate-800 flex-shrink-0">
-            <Image
-              src={session?.user?.image || "/imagenes/profile.jpg"}
-              alt="Avatar"
-              width={40}
-              height={40}
-              className="object-cover w-full h-full"
+  return (
+    <>
+      {/* Sidebar Escritorio */}
+      <motion.aside
+        initial={false}
+        animate={isSidebarCollapsed ? "collapsed" : "expanded"}
+        variants={sidebarVariants}
+        className="hidden lg:block h-screen z-40 sticky top-0"
+      >
+        {renderSidebarContent(isSidebarCollapsed)}
+      </motion.aside>
+
+      {/* Sidebar Móvil (Drawer) */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            {/* Backdrop con Blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeSidebarMobile}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[50] lg:hidden"
             />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-[var(--sidebar-text-active)] truncate">{session?.user?.name || 'Usuario SAE'}</p>
-            <p className="text-[10px] font-medium text-[var(--sidebar-text)] uppercase tracking-wider">{role}</p>
-          </div>
-          <FiSettings className="text-[var(--sidebar-text)] group-hover:text-white transition-colors" />
-        </Link>
-
-        <button
-          onClick={() => signOut({ callbackUrl: '/auth/login' })}
-          className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-[var(--sidebar-hover-bg)] hover:bg-red-500/10 text-[var(--sidebar-text)] hover:text-red-500 transition-all font-bold text-sm tracking-wide group"
-        >
-          <FiLogOut className="transition-transform group-hover:-translate-x-1" />
-          Cerrar Sesión
-        </button>
-      </div>
-
-      {/* Efecto decorativo eliminado a petición del usuario */}
-    </aside>
+            
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 w-[280px] z-[60] lg:hidden shadow-2xl"
+            >
+              <button 
+                onClick={closeSidebarMobile}
+                className="absolute top-4 -right-12 text-white p-2 hover:bg-white/10 rounded-full"
+              >
+                <FiX size={24} />
+              </button>
+              {renderSidebarContent(false)}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
