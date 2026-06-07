@@ -52,24 +52,19 @@ export const getAdminDrillDown = async (request: DrillDownRequest): Promise<Dril
   return response.data;
 };
 
-// TODO: conectar a POST /api/admin/reports/export cuando esté disponible
+/**
+ * Generar reporte de administración
+ * @api POST /api/admin/reports/generate
+ */
 export const exportAdminReport = async (request: ExportRequest): Promise<ExportResponse> => {
-  return new Promise((resolve) => {
-    // Simular tiempo de procesamiento
-    setTimeout(() => {
-      if (request.format === 'excel') {
-        resolve({
-          status: 'processing',
-          message: 'El conjunto de datos es mayor a 10,000 registros. Se generará en segundo plano y se enviará un enlace de descarga a tu correo.',
-        });
-      } else {
-        resolve({
-          status: 'ready',
-          downloadUrl: 'https://ejemplo.com/download/reporte_sae.pdf',
-        });
-      }
-    }, 2000);
+  const response = await apiClient.post<ExportResponse>('/admin/reports/generate', {
+    format: request.format,
+    filters: {
+      career: request.filters.careerId,
+      semester: request.filters.semester
+    }
   });
+  return response.data;
 };
 
 /**
@@ -77,8 +72,13 @@ export const exportAdminReport = async (request: ExportRequest): Promise<ExportR
  * @api GET /api/carreras
  */
 export const getAdminCarreras = async (): Promise<Carrera[]> => {
-  const response = await apiClient.get<Carrera[]>('/carreras');
-  return response.data;
+  try {
+    const response = await apiClient.get<Carrera[]>('/carreras');
+    return response.data;
+  } catch (error: any) {
+    console.warn('getAdminCarreras failed:', error?.message || error);
+    return [];
+  }
 };
 
 /**
@@ -140,4 +140,56 @@ export const updateAlertTag = async (id: string, data: UpdateAlertCatalogDto): P
  */
 export const deleteAlertTag = async (id: string): Promise<void> => {
   await apiClient.delete(`/alert-catalog/${id}`);
+};
+
+/**
+ * Obtener detalles de una carrera específica
+ * @api GET /carreras/{id}
+ */
+export const getCarreraById = async (id: string): Promise<Carrera> => {
+  const response = await apiClient.get<Carrera>(`/carreras/${id}`);
+  return response.data;
+};
+
+/**
+ * Obtener la lista de alumnos asociados a una carrera
+ * @api GET /carreras/{id}/alumnos
+ */
+export const getCarreraAlumnos = async (id: string): Promise<any[]> => {
+  try {
+    const response = await apiClient.get<any[]>(`/carreras/${id}/alumnos`);
+    return response.data;
+  } catch (error: any) {
+    console.warn(`getCarreraAlumnos failed for career ${id}:`, error?.message || error);
+    return [];
+  }
+};
+
+/**
+ * Obtener la lista de docentes asociados a una carrera
+ * @api GET /carreras/{id}/docentes
+ */
+export const getCarreraDocentes = async (id: string): Promise<any[]> => {
+  const response = await apiClient.get<any[]>(`/carreras/${id}/docentes`);
+  return response.data;
+};
+
+/**
+ * Asignar un docente a una carrera
+ * @api PATCH /carreras/asignar/docente/{docenteId}
+ */
+export const asignarDocenteACarrera = async (docenteId: string, carreraId: string): Promise<any> => {
+  const response = await apiClient.patch<any>(`/carreras/asignar/docente/${docenteId}`, {
+    carreraId
+  });
+  return response.data;
+};
+
+/**
+ * Asignar un alumno a una carrera y tutor
+ * @api PATCH /carreras/asignar/alumno/{alumnoId}
+ */
+export const asignarAlumnoACarrera = async (alumnoId: string, data: { carreraId: string; tutorId: string }): Promise<any> => {
+  const response = await apiClient.patch<any>(`/carreras/asignar/alumno/${alumnoId}`, data);
+  return response.data;
 };

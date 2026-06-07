@@ -242,7 +242,7 @@ export function RiskProfilePanel({
   onReferToPsychology,
   onReferToMedical,
 }: RiskProfilePanelProps) {
-  const { profile, academicHistory, isLoading, error, refetch } =
+  const { profile, academicHistory, evaluations, isLoading, error, refetch } =
     useStudentRiskProfile(studentId);
 
   if (isLoading) return <SkeletonRiskProfile />;
@@ -300,6 +300,53 @@ export function RiskProfilePanel({
         </h2>
         <AlertHistoryTimeline history={profile.alertHistory} />
       </section>
+
+      {/* Historial de cuestionarios (HU007 - Tutor View) */}
+      <section
+        aria-labelledby="evaluations-history-heading"
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+      >
+        <h2 id="evaluations-history-heading" className="text-sm font-bold text-gray-700 mb-4 flex items-center justify-between">
+          <span>Historial de Cuestionarios</span>
+          <span className="flex items-center gap-1 text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-0.5 border border-slate-100 rounded-md uppercase tracking-wider">
+            🔒 Scores Protegidos
+          </span>
+        </h2>
+        
+        {evaluations.length === 0 ? (
+          <p className="text-xs text-slate-400 text-center py-6">No hay cuestionarios previos registrados.</p>
+        ) : (
+          <div className="space-y-4">
+            {evaluations.map((item) => (
+              <div 
+                key={item.id} 
+                className="flex justify-between items-center p-3 hover:bg-slate-50/50 rounded-xl transition-all border border-transparent hover:border-slate-50"
+              >
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-slate-800">
+                    Cuestionario SAE — {new Date(item.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Folio: {item.id.slice(0, 8).toUpperCase()} · Estado: {item.estado}
+                  </p>
+                </div>
+                {item.resultado && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-black text-slate-400 italic">Score 🔒</span>
+                    <Semaforo
+                      estado={item.resultado.semaforo}
+                      etiqueta={item.resultado.diagnostico || 'Procesado'}
+                      dimension="Riesgo"
+                      size="sm"
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
 
       {/* Acciones rápidas */}
       <div className="flex flex-col gap-3">

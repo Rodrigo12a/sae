@@ -1,7 +1,11 @@
 /**
- * @service SurveyService
- * @epic Épica 3 — Encuesta de Contexto (Estudiante)
+ * @module SurveyService
+ * @epic EPICA-3 Encuesta de Contexto (Estudiante)
  * @hu HU007, HU008
+ * @ux UXEN-01 to UXEN-08
+ * @qa QA-07 (Modo offline)
+ * @api POST /api/questionnaire/submit · GET /api/surveys/:id/resources
+ * @privacy rol:estudiante
  */
 
 import { api } from "@/src/lib/api";
@@ -86,16 +90,43 @@ export const surveyService = {
     }
   },
 
-  /**
-   * Envía las respuestas de la encuesta
-   * HU007 - Criterio 2
-   */
   submitSurvey: async (data: SurveySubmitRequest): Promise<SurveySubmitResponse> => {
     try {
-      const response = await api.post<SurveySubmitResponse>(`/surveys/${data.surveyId}/submit`, data);
-      return response.data;
+      const respuestas = data.responses.map(item => {
+        const preguntaId = parseInt(item.questionId.replace(/\D/g, ""), 10);
+        let valor = 0;
+        if (typeof item.value === 'string') {
+          if (!isNaN(Number(item.value))) {
+            valor = Number(item.value);
+          } else {
+            const valMap: Record<string, number> = {
+              'alta': 3,
+              'media': 2,
+              'baja': 1,
+              'nula': 0,
+              'si': 3,
+              'algunas': 2,
+              'no': 0,
+              'ambos': 3,
+              'espacio': 2,
+              'internet': 1,
+              'ninguno': 0
+            };
+            valor = valMap[item.value.toLowerCase()] ?? 0;
+          }
+        } else if (Array.isArray(item.value)) {
+          valor = Number(item.value[0]) || 0;
+        }
+        return { preguntaId, valor };
+      }).filter(r => !isNaN(r.preguntaId));
+
+      const response = await api.post<any>('/questionnaire/submit', { respuestas });
+      return {
+        success: true,
+        message: response.data.message || "Tus respuestas fueron recibidas"
+      };
     } catch (error) {
-      console.warn("Survey API: submitSurvey fallback to mock");
+      console.warn("Survey API: submitSurvey fallback to mock", error);
       return {
         success: true,
         message: "Tus respuestas fueron recibidas"
@@ -108,31 +139,34 @@ export const surveyService = {
    * @hu HU008
    */
   getResources: async (surveyId: string): Promise<InstitutionalResource[]> => {
-    // TODO: conectar a GET /api/surveys/:id/resources cuando esté disponible
-    await new Promise(resolve => setTimeout(resolve, 800)); // Simular latencia
-
-    return [
-      {
-        id: '1',
-        title: 'Apoyo Académico',
-        description: 'Tutorías personalizadas para mejorar tu desempeño.',
-        icon: '📚',
-        location: 'Edificio A, Planta Baja',
-      },
-      {
-        id: '2',
-        title: 'Bienestar Estudiantil',
-        description: 'Atención psicológica y orientación emocional.',
-        icon: '🌱',
-        phone: '555-0192',
-      },
-      {
-        id: '3',
-        title: 'Becas y Apoyos',
-        description: 'Información sobre programas de financiamiento.',
-        icon: '🎓',
-        link: 'https://campus.institucion.edu/becas',
-      }
-    ];
+    try {
+      const response = await api.get<InstitutionalResource[]>(`/surveys/${surveyId}/resources`);
+      return response.data;
+    } catch (error) {
+      console.warn("Survey API: getResources fallback to mock", error);
+      return [
+        {
+          id: '1',
+          title: 'Apoyo Académico',
+          description: 'Tutorías personalizadas para mejorar tu desempeño.',
+          icon: '📚',
+          location: 'Edificio A, Planta Baja',
+        },
+        {
+          id: '2',
+          title: 'Bienestar Estudiantil',
+          description: 'Atención psicológica y orientación emocional.',
+          icon: '🌱',
+          phone: '555-0192',
+        },
+        {
+          id: '3',
+          title: 'Becas y Apoyos',
+          description: 'Información sobre programas de financiamiento.',
+          icon: '🎓',
+          link: 'https://campus.institucion.edu/becas',
+        }
+      ];
+    }
   }
 };

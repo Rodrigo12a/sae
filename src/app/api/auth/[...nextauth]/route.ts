@@ -26,13 +26,14 @@ const handler = NextAuth({
             throw new Error(data.error || "Login failed");
           }
 
-          const { user, token } = data.session;
+          const { user, token, needsConsent } = data.session;
 
           return {
             id: user.id,
             name: user.name,
             role: user.role,
             accessToken: token,
+            needsConsent,
           };
         } catch (error) {
           const message = error instanceof Error ? error.message : "Error de autenticación institucional";
@@ -50,9 +51,10 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken;
-        token.role = user.role;
+        token.accessToken = (user as any).accessToken;
+        token.role = (user as any).role;
         token.uid = user.id;
+        token.needsConsent = (user as any).needsConsent;
       }
       return token;
     },
@@ -61,6 +63,7 @@ const handler = NextAuth({
       session.user.id = token.uid as string;
       session.user.role = token.role as string;
       session.accessToken = token.accessToken as string;
+      (session as any).needsConsent = token.needsConsent;
       return session;
     },
   },

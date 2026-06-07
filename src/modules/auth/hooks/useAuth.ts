@@ -12,7 +12,7 @@ export function useAuth() {
     try {
       return await authService.login(data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Login failed");
+      setError(err.message || "Error al iniciar sesión");
       throw err;
     } finally {
       setLoading(false);
@@ -25,7 +25,7 @@ export function useAuth() {
     try {
       return await authService.register(data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Register failed");
+      setError(err.message || "Error al registrarse");
       throw err;
     } finally {
       setLoading(false);
@@ -38,7 +38,7 @@ export function useAuth() {
     try {
       return await authService.forgotPassword(data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Request failed");
+      setError(err.message || "Error al procesar la solicitud");
       throw err;
     } finally {
       setLoading(false);

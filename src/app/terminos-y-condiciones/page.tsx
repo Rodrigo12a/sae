@@ -14,7 +14,7 @@ export default function TermsPage() {
       <div className="max-w-3xl mx-auto space-y-12">
         {/* Header */}
         <header className="space-y-6">
-          <Link 
+          <Link
             href="/auth/login"
             className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--color-primary)] transition-colors"
           >
@@ -33,41 +33,26 @@ export default function TermsPage() {
 
         {/* Content */}
         <main className="space-y-10 bg-white p-10 rounded-[2.5rem] border border-[var(--border-subtle)] shadow-sm">
-          
+
           <section className="space-y-4">
             <div className="flex items-center gap-3 text-[var(--color-primary)]">
               <FiShield size={24} />
               <h2 className="text-xl font-bold">1. Protección de Datos</h2>
             </div>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, 
-              la Universidad Politécnica del Estado de Tlaxcala (UPET) asegura que el tratamiento de sus datos 
+              En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares,
+              la Universidad Politécnica del Estado de Tlaxcala (UPTx) asegura que el tratamiento de sus datos
               personales y clínicos se realiza bajo los más estrictos estándares de seguridad y confidencialidad.
             </p>
           </section>
 
           <section className="space-y-4">
-            <div className="flex items-center gap-3 text-[var(--color-secondary)]">
-              <FiLock size={24} />
-              <h2 className="text-xl font-bold">2. Privacidad Diferencial</h2>
-            </div>
-            <p className="text-[var(--text-secondary)] leading-relaxed">
-              Nuestra plataforma SAE utiliza un sistema de **Privacidad Diferencial** por rol. Esto significa que:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-[var(--text-secondary)]">
-              <li>Los <strong>Tutores</strong> solo tienen acceso a etiquetas operativas y semáforos de riesgo.</li>
-              <li>Los datos clínicos detallados son accesibles exclusivamente por el <strong>Personal Médico y Psicológico</strong>.</li>
-              <li>Los <strong>Administradores</strong> pueden visualizar métricas agregadas pero no diagnósticos privados.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
             <div className="flex items-center gap-3 text-[var(--color-primary)]">
               <FiFileText size={24} />
-              <h2 className="text-xl font-bold">3. Uso de la Información</h2>
+              <h2 className="text-xl font-bold">2. Uso de la Información</h2>
             </div>
             <p className="text-[var(--text-secondary)] leading-relaxed">
-              La información recopilada a través de encuestas y expedientes tiene como único fin la 
+              La información recopilada a través de encuestas y expedientes tiene como único fin la
               detección temprana del riesgo de abandono escolar y el acompañamiento académico del estudiante.
             </p>
           </section>
@@ -77,7 +62,7 @@ export default function TermsPage() {
         {/* Footer info */}
         <footer className="text-center pt-8 border-t border-[var(--border-subtle)]">
           <p className="text-sm text-[var(--text-muted)]">
-            Para dudas adicionales, contacte a <span className="text-[var(--text-primary)] font-medium">privacidad@upet.edu.mx</span>
+            Para dudas adicionales, contacte a <span className="text-[var(--text-primary)] font-medium">privacidad@uptx.edu.mx</span>
           </p>
         </footer>
       </div>

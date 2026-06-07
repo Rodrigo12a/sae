@@ -100,7 +100,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, filte
                   Selecciona el formato en el que deseas exportar los datos. Se aplicarán los filtros actuales del dashboard.
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   {/* PDF Option */}
                   <label
                     className={`cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center text-center transition-all ${

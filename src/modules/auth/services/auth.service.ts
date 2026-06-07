@@ -24,7 +24,14 @@ export const authService = {
   },
 
   forgotPassword: async (data: ForgotPasswordDto) => {
-    const response = await api.post("/auth/forgot-password", data);
-    return response.data;
+    try {
+      const response = await api.post("/auth/forgot-password", data);
+      return response.data;
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      const message =
+        axiosError.response?.data?.message ?? "Error al solicitar recuperación de contraseña";
+      throw new Error(message);
+    }
   },
 };

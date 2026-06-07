@@ -18,12 +18,12 @@ const NAV_CONFIG = {
         { path: '/admin/dashboard', icon: <FiPieChart />, title: 'Dashboard Ejecutivo', subTitle: 'Vista Global' },
         { path: '/admin/dashboard/carreras', icon: <FiTrendingUp />, title: 'KPIs por Carrera', subTitle: 'Rendimiento' },
         { path: '/admin/dashboard/drilldown', icon: <FiLayers />, title: 'Detalle de Grupos', subTitle: 'Anomalías' },
+        { path: '/admin/evaluaciones', icon: <FiClipboard />, title: 'Monitoreo Cuestionarios', subTitle: 'Evaluaciones SAE' },
       ]
     },
     {
       section: 'Gestión', items: [
         { path: '/admin/dashboard/tutores', icon: <FiUsers />, title: 'Gestión Docente', subTitle: 'Desempeño', badge: 2 },
-        { path: '/admin/dashboard/estudiantes', icon: <FiUsers />, title: 'Gestión Estudiantes', subTitle: 'Base de datos' },
         { path: '/admin/dashboard/catalogo', icon: <FiClipboard />, title: 'Catálogo Alertas', subTitle: 'Configuración' },
         { path: '/admin/dashboard/configuracion', icon: <FiSettings />, title: 'Configuración', subTitle: 'Control de Usuarios' },
         { path: '/admin/dashboard/reportes', icon: <FiDownload />, title: 'Exportar Datos', subTitle: 'PDF / Excel' },

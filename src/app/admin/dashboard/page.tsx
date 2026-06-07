@@ -258,7 +258,7 @@ export default function AdminDashboardPage() {
             {isVisible('inconsistencies') && (
               <div className="bg-white border border-[var(--border-subtle)] rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-[350px]">
                 <h2 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-[0.1em] mb-6">Inconsistencias de Servicio</h2>
-                <div className="overflow-y-auto flex-1">
+                <div className="overflow-auto flex-1">
                   <table className="w-full text-xs">
                     <thead className="sticky top-0 bg-white">
                       <tr className="border-b border-gray-100">

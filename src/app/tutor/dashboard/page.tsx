@@ -14,6 +14,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { PriorityAlertWidget } from '@/src/features/dashboard-tutor/components/PriorityAlertWidget';
 import { useSession } from 'next-auth/react';
+import { MisTutorados } from '@/src/features/dashboard-tutor/components/MisTutorados';
 
 export default function TutorDashboardPage() {
   const router = useRouter();
@@ -46,9 +47,10 @@ export default function TutorDashboardPage() {
       {/* Contenido principal */}
       <div className="max-w-5xl mx-auto px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Columna principal: Widget de alertas prioritarias */}
-          <div className="lg:col-span-2">
+          {/* Columna principal: Widget de alertas prioritarias y lista de tutorados */}
+          <div className="lg:col-span-2 space-y-6">
             <PriorityAlertWidget onViewStudent={handleViewStudent} />
+            <MisTutorados />
           </div>
 
           {/* Columna lateral: Resumen rápido */}

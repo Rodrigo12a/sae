@@ -9,6 +9,7 @@
  *          El backend filtra por JWT. Este servicio usa DimensionSaludTutor como tipo.
  */
 
+import { api } from '@/src/lib/api';
 import type { StudentRiskProfile, AcademicHistory } from '@/src/types/student';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -174,13 +175,8 @@ const MOCK_ACADEMIC_HISTORY: Record<string, AcademicHistory> = {
  * @privacy El backend filtra por JWT — respuesta para tutor NUNCA incluye diagnosticoClinico.
  */
 export async function getStudentRiskProfile(studentId: string): Promise<StudentRiskProfile> {
-  // TODO: conectar a GET /students/:id/risk-profile cuando esté disponible en Swagger
-  // return api.get<StudentRiskProfile>(`/students/${studentId}/risk-profile`).then(res => res.data);
-
-  await new Promise(resolve => setTimeout(resolve, 700));
-  const profile = MOCK_RISK_PROFILES[studentId];
-  if (!profile) throw new Error(`Estudiante ${studentId} no encontrado`);
-  return profile;
+  const response = await api.get<StudentRiskProfile>(`/students/${studentId}/risk-profile`);
+  return response.data;
 }
 
 /**
@@ -188,20 +184,6 @@ export async function getStudentRiskProfile(studentId: string): Promise<StudentR
  * Datos para renderizar gráficas con Recharts.
  */
 export async function getStudentAcademicHistory(studentId: string): Promise<AcademicHistory> {
-  // TODO: conectar a GET /students/:id/academic-history cuando esté disponible en Swagger
-  // return api.get<AcademicHistory>(`/students/${studentId}/academic-history`).then(res => res.data);
-
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const history = MOCK_ACADEMIC_HISTORY[studentId];
-  if (!history) {
-    // Retornar datos vacíos para estudiantes sin historial
-    return {
-      studentId,
-      asistencia: [],
-      calificaciones: [],
-      promedioGeneral: 0,
-      asistenciaGeneral: 0,
-    };
-  }
-  return history;
+  const response = await api.get<AcademicHistory>(`/students/${studentId}/academic-history`);
+  return response.data;
 }

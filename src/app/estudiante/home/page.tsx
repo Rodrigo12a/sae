@@ -75,7 +75,14 @@ export default function EstudianteHomePage() {
             >
               Completar Encuesta SAE <FiArrowRight />
             </Link>
+            <Link 
+              href="/estudiante/mis-evaluaciones" 
+              className="px-8 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-2xl font-black transition-all flex items-center gap-2 backdrop-blur-md"
+            >
+              Historial de Evaluaciones <FiBookOpen />
+            </Link>
           </div>
+
         </div>
         {/* Abstract shapes */}
         <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -228,7 +235,7 @@ export default function EstudianteHomePage() {
                     <FiShield />
                   </div>
                   <p className="text-sm text-[var(--text-primary)] leading-relaxed font-medium">
-                    No olvides completar tu encuesta de salud y socioeconómica en la sección "Encuestas".
+                    No olvides completar tu encuesta de salud y socioeconómica en la sección &quot;Encuestas&quot;.
                   </p>
                 </div>
                 <button 

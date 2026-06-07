@@ -4,6 +4,7 @@
  * @hu HU002, HU023
  * @ux UX-ADM-01 (Gestión de Usuarios)
  * @api GET /api/users · PATCH /api/users/:id · DELETE /api/users/:id
+ * @privacy Muestra datos agregados de usuarios y columna de Tutor Asignado. No expone datos clínicos.
  */
 
 import React from 'react';
@@ -44,6 +45,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, i
             <th className="px-6 py-3">Usuario</th>
             <th className="px-6 py-3">Rol / Nivel</th>
             <th className="px-6 py-3">ID / Matrícula</th>
+            <th className="px-6 py-3">Tutor / Carrera</th>
             <th className="px-6 py-3 text-right">Acciones</th>
           </tr>
         </thead>
@@ -83,6 +85,26 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, i
                   <span className="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-section)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
                     {user.matricula || user.uid?.substring(0, 8) || 'S/ID'}
                   </span>
+                </td>
+                <td className="px-6 py-4 border-y border-[var(--border-subtle)]">
+                  {user.role === 'ALUMNO' ? (
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-700 font-bold">
+                        Tutor: {(user as any).tutorNombre || (user as any).tutorName || (user as any).tutor || 'Sin tutor'}
+                      </span>
+                      {(user as any).carreraNombre && (
+                        <span className="text-[10px] text-gray-500 font-medium">
+                          Carrera: {(user as any).carreraNombre}
+                        </span>
+                      )}
+                    </div>
+                  ) : user.role === 'DOCENTE' ? (
+                    <span className="text-xs text-blue-700 font-bold">
+                      Carrera: {(user as any).carreraNombre || 'Sin carrera asignada'}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray-400 italic">—</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 rounded-r-xl border-y border-r border-[var(--border-subtle)] text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

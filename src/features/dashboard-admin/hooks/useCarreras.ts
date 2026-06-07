@@ -5,7 +5,7 @@ import {
   updateCarrera, 
   deleteCarrera 
 } from '@/src/services/api/admin';
-import { CreateCarreraDto, UpdateCarreraDto } from '@/src/types/admin';
+import { CreateCarreraDto, UpdateCarreraDto, Carrera } from '@/src/types/admin';
 import { toast } from 'sonner';
 
 /**
@@ -26,6 +26,7 @@ export const useCarreras = () => {
     mutationFn: (data: CreateCarreraDto) => createCarrera(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['carreras'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-kpis'] });
       toast.success('Carrera creada exitosamente');
     },
     onError: (error: any) => {
@@ -35,12 +36,34 @@ export const useCarreras = () => {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCarreraDto }) => updateCarrera(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['carreras'] });
-      toast.success('Carrera actualizada exitosamente');
+    onMutate: async ({ id, data }) => {
+      // Cancelar cualquier refetch pendiente para evitar sobrescribir la actualización optimista
+      await queryClient.cancelQueries({ queryKey: ['carreras'] });
+
+      // Guardar el estado previo para rollback
+      const previousCarreras = queryClient.getQueryData<Carrera[]>(['carreras']);
+
+      // Actualización optimista: aplicar el cambio de inmediato en la UI
+      queryClient.setQueryData<Carrera[]>(['carreras'], (old) =>
+        old?.map((c) => (c.id === id ? { ...c, ...data } : c)) ?? []
+      );
+
+      return { previousCarreras };
     },
-    onError: (error: any) => {
+    onError: (error: any, _variables, context) => {
+      // Rollback al estado previo si la mutación falla
+      if (context?.previousCarreras) {
+        queryClient.setQueryData(['carreras'], context.previousCarreras);
+      }
       toast.error('Error al actualizar carrera: ' + (error.response?.data?.message || error.message));
+    },
+    onSettled: () => {
+      // Siempre re-sincronizar con el servidor después de la mutación
+      queryClient.invalidateQueries({ queryKey: ['carreras'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-kpis'] });
+    },
+    onSuccess: () => {
+      toast.success('Carrera actualizada exitosamente');
     }
   });
 
@@ -48,6 +71,7 @@ export const useCarreras = () => {
     mutationFn: (id: string) => deleteCarrera(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['carreras'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-kpis'] });
       toast.success('Carrera eliminada exitosamente');
     },
     onError: (error: any) => {

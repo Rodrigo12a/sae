@@ -182,55 +182,59 @@ function TutoradoListItem({
 
   return (
     <article
-      className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm"
+      className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm"
       aria-label={`Tutorado ${tutorado.nombre ?? tutorado.matricula}`}
     >
-      {/* Avatar */}
-      <div
-        className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white bg-[var(--color-secondary)]"
-        aria-hidden="true"
-      >
-        {initials}
+      <div className="flex items-center gap-4 w-full sm:w-auto flex-1 min-w-0">
+        {/* Avatar */}
+        <div
+          className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white bg-[var(--color-secondary)]"
+          aria-hidden="true"
+        >
+          {initials}
+        </div>
+
+        {/* Datos */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-gray-900 truncate">
+            {tutorado.nombre}
+          </p>
+          <p className="text-xs text-gray-500 font-medium">Matrícula: {tutorado.matricula || 'N/A'}</p>
+          <p className="text-[10px] text-gray-400 font-medium italic">Registrado el {new Date(tutorado.createdAt).toLocaleDateString()}</p>
+        </div>
       </div>
 
-      {/* Datos */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-gray-900 truncate">
-          {tutorado.nombre}
-        </p>
-        <p className="text-xs text-gray-500 font-medium">Matrícula: {tutorado.matricula || 'N/A'}</p>
-        <p className="text-[10px] text-gray-400 font-medium italic">Registrado el {new Date(tutorado.createdAt).toLocaleDateString()}</p>
-      </div>
-
-      {/* Estado de cuenta */}
-      <span
-        className={`
-          shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
-          bg-green-50 text-green-700 border border-green-200
-        `}
-      >
+      <div className="flex items-center justify-between w-full sm:w-auto sm:ml-auto gap-4 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-gray-50 sm:border-0">
+        {/* Estado de cuenta */}
         <span
-          className="w-1.5 h-1.5 rounded-full bg-green-500"
-        />
-        Activa
-      </span>
+          className={`
+            shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
+            bg-green-50 text-green-700 border border-green-200
+          `}
+        >
+          <span
+            className="w-1.5 h-1.5 rounded-full bg-green-500"
+          />
+          Activa
+        </span>
 
-      {/* Acciones */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={onEdit}
-          className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
-          title="Editar datos"
-        >
-          <FiEdit2 size={16} />
-        </button>
-        <button
-          onClick={onDelete}
-          className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
-          title="Eliminar estudiante"
-        >
-          <FiTrash2 size={16} />
-        </button>
+        {/* Acciones */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onEdit}
+            className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+            title="Editar datos"
+          >
+            <FiEdit2 size={16} />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all"
+            title="Eliminar estudiante"
+          >
+            <FiTrash2 size={16} />
+          </button>
+        </div>
       </div>
     </article>
   );

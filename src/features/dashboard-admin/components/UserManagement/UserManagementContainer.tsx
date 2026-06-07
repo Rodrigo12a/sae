@@ -4,6 +4,7 @@
  * @hu HU002, HU023
  * @ux UX-ADM-01 (Gestión de Usuarios)
  * @api GET /api/users · POST /api/users · PATCH /api/users/:id · DELETE /api/users/:id
+ * @privacy Solo accesible por rol administrador. Las contraseñas se manejan de manera privada y no se guardan en logs.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -84,8 +85,11 @@ export const UserManagementContainer: React.FC = () => {
     }
   };
 
-  const handleSave = async (data: CreateUserDto) => {
+  const handleSave = async (data: CreateUserDto & { carreraId?: string; tutorId?: string }) => {
     setIsSaving(true);
+    // DEBUG: Ver el payload que se está enviando
+    console.log('UserManagementContainer: Enviando payload:', data);
+    
     try {
       if (selectedUser) {
         await userService.update(selectedUser.uid, data);
@@ -96,8 +100,20 @@ export const UserManagementContainer: React.FC = () => {
       }
       setIsModalOpen(false);
       loadUsers();
-    } catch (error) {
-      toast.error('Error al guardar el usuario');
+    } catch (error: any) {
+      console.error('UserManagementContainer: Error al guardar usuario:', error);
+      
+      // Intentar obtener el mensaje detallado del backend
+      const responseData = error.response?.data;
+      const errorMessage = responseData?.message || responseData?.error || 'Error al guardar el usuario';
+      
+      // Si el mensaje es un array (validaciones DTO de NestJS), tomamos el primero
+      const finalMessage = Array.isArray(errorMessage) ? errorMessage[0] : errorMessage;
+      
+      toast.error(finalMessage, {
+        description: 'Verifica los datos e intenta nuevamente.',
+        duration: 5000,
+      });
     } finally {
       setIsSaving(false);
     }

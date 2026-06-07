@@ -4,16 +4,21 @@
  * @hu HU002, HU023
  * @ux UX-ADM-01 (Gestión de Usuarios)
  * @api POST /api/users · PATCH /api/users/:id
+ * @privacy Solo accesible para administradores y tutores autenticados. Las contraseñas están ocultas en tránsito.
  */
 
 import React, { useState, useEffect } from 'react';
-import { CreateUserDto, User, UserRole } from '@/src/services/api/users';
-import { FiX, FiSave, FiUser, FiMail, FiLock, FiShield, FiHash } from 'react-icons/fi';
+import { CreateUserDto, User, UserRole, userService } from '@/src/services/api/users';
+import { getAdminCarreras } from '@/src/services/api/admin';
+import { Carrera } from '@/src/types/admin';
+import { useSession } from 'next-auth/react';
+import { ROLE_ALIAS_MAP } from '@/src/lib/rbac.config';
+import { FiX, FiSave, FiUser, FiMail, FiLock, FiShield, FiHash, FiAlertCircle } from 'react-icons/fi';
 
 interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: CreateUserDto) => Promise<void>;
+  onSave: (data: CreateUserDto & { carreraId?: string; tutorId?: string }) => Promise<void>;
   user?: User | null;
   isSaving: boolean;
   lockRole?: UserRole;
@@ -28,6 +33,13 @@ const ROLES: { value: UserRole; label: string }[] = [
 ];
 
 export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, user, isSaving, lockRole }) => {
+  const { data: session } = useSession();
+  const rawRole = session?.user?.role;
+  const normalizedRole = rawRole ? ROLE_ALIAS_MAP[rawRole.toLowerCase()] : null;
+  const isCurrentUserAdmin = normalizedRole === 'administrador';
+  const isCurrentUserTutor = normalizedRole === 'tutor';
+  const currentUserId = session?.user?.id;
+
   const [formData, setFormData] = useState<CreateUserDto>({
     nombre: '',
     email: '',
@@ -35,6 +47,11 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
     role: lockRole || 'DOCENTE',
     matricula: '',
   });
+
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [tutores, setTutores] = useState<User[]>([]);
+  const [selectedCarreraId, setSelectedCarreraId] = useState('');
+  const [selectedTutorId, setSelectedTutorId] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -45,6 +62,7 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
         matricula: user.matricula || '',
         password: '', // Password empty when editing
       });
+      setSelectedCarreraId((user as any).carreraId || '');
     } else {
       setFormData({
         nombre: '',
@@ -53,14 +71,85 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
         role: lockRole || 'DOCENTE',
         matricula: '',
       });
+      setSelectedCarreraId('');
     }
   }, [user, isOpen, lockRole]);
 
+  useEffect(() => {
+    if (isOpen && (formData.role === 'ALUMNO' || formData.role === 'DOCENTE')) {
+      getAdminCarreras()
+        .then(data => {
+          setCarreras(data);
+          // Only auto-select first career if the user is not a tutor (tutors load it from their profile)
+          // and we are not editing (or if editing and selectedCarreraId is empty)
+          const hasSelectedCarrera = user && (user as any).carreraId;
+          if (!hasSelectedCarrera && !isCurrentUserTutor && data.length > 0) {
+            setSelectedCarreraId(data[0].id);
+          }
+        })
+        .catch(err => console.error('Error fetching careers:', err));
+
+      if (formData.role === 'ALUMNO' && !user) {
+        if (isCurrentUserAdmin) {
+          userService.getAll()
+            .then(data => {
+              const docenteUsers = data.filter(u => u.role === 'DOCENTE');
+              setTutores(docenteUsers);
+            })
+            .catch(err => console.error('Error fetching tutors:', err));
+        } else if (isCurrentUserTutor && currentUserId) {
+          setSelectedTutorId(currentUserId);
+          // Fetch tutor's profile to retrieve their carreraId
+          userService.getById(currentUserId)
+            .then((tutorProfile: any) => {
+              if (tutorProfile?.carreraId) {
+                setSelectedCarreraId(tutorProfile.carreraId);
+              }
+            })
+            .catch(err => console.error('Error fetching tutor profile:', err));
+        }
+      }
+    }
+  }, [isOpen, formData.role, user, isCurrentUserAdmin, isCurrentUserTutor, currentUserId]);
+
+  // Filter tutors by the selected career for Admin
+  const filteredTutores = tutores.filter(t => (t as any).carreraId === selectedCarreraId);
+
+  // Automatically update selectedTutorId to match the filtered list for Admins
+  useEffect(() => {
+    if (isCurrentUserAdmin && selectedCarreraId && tutores.length > 0) {
+      if (filteredTutores.length > 0) {
+        if (!filteredTutores.some(t => t.uid === selectedTutorId)) {
+          setSelectedTutorId(filteredTutores[0].uid);
+        }
+      } else {
+        setSelectedTutorId('');
+      }
+    }
+  }, [selectedCarreraId, tutores, isCurrentUserAdmin, selectedTutorId, filteredTutores]);
+
   if (!isOpen) return null;
+
+  const handleRoleChange = (role: UserRole) => {
+    setFormData(prev => ({
+      ...prev,
+      role,
+      // Limpiar campos excluyentes al cambiar de rol para evitar payloads sucios
+      email: role === 'ALUMNO' ? '' : prev.email,
+      matricula: role === 'ALUMNO' ? prev.matricula : '',
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave(formData);
+    const payload: any = { ...formData };
+    if (formData.role === 'ALUMNO' && !user) {
+      payload.carreraId = selectedCarreraId;
+      payload.tutorId = isCurrentUserTutor ? currentUserId : selectedTutorId;
+    } else if (formData.role === 'DOCENTE') {
+      payload.carreraId = selectedCarreraId || null;
+    }
+    await onSave(payload);
   };
 
   return (
@@ -100,24 +189,6 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
               />
             </div>
 
-            {/* Email (Hidden for students) */}
-            {formData.role !== 'ALUMNO' && (
-              <div className="space-y-1 animate-fade-in">
-                <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
-                  <FiMail size={12} />
-                  CORREO ELECTRÓNICO
-                </label>
-                <input
-                  required={!user}
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-medium"
-                  placeholder="ejemplo@sae.edu"
-                />
-              </div>
-            )}
-
             {/* Role selection (Hidden if locked) */}
             {!lockRole && (
               <div className="space-y-1">
@@ -127,7 +198,7 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
                 </label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
+                  onChange={(e) => handleRoleChange(e.target.value as UserRole)}
                   className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
                 >
                   {ROLES.map((role) => (
@@ -137,12 +208,30 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
               </div>
             )}
 
+            {/* Email (Hidden for students) */}
+            {formData.role !== 'ALUMNO' && (
+              <div className="space-y-1 animate-fade-in">
+                <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                  <FiMail size={12} />
+                  CORREO ELECTRÓNICO INSTITUCIONAL
+                </label>
+                <input
+                  required={!user}
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-medium"
+                  placeholder="ejemplo@uptx.edu.mx"
+                />
+              </div>
+            )}
+
             {/* Matricula (only if student) */}
             {formData.role === 'ALUMNO' && (
               <div className="space-y-1 animate-slide-up">
                 <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
                   <FiHash size={12} />
-                  MATRÍCULA INSTITUCIONAL
+                  MATRÍCULA / ID ESTUDIANTIL
                 </label>
                 <input
                   required
@@ -150,9 +239,84 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
                   value={formData.matricula}
                   onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
                   className="w-full px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-bold"
-                  placeholder="ID del Estudiante"
+                  placeholder="Ej. 20230001"
                 />
               </div>
+            )}
+
+            {/* Carrera selector for Docente (Both creation and edit) */}
+            {formData.role === 'DOCENTE' && (
+              <div className="space-y-1 animate-slide-up">
+                <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                  <FiShield size={12} />
+                  CARRERA ASIGNADA AL TUTOR
+                </label>
+                <select
+                  required
+                  value={selectedCarreraId}
+                  onChange={(e) => setSelectedCarreraId(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                >
+                  <option value="">-- Seleccionar Carrera --</option>
+                  {carreras.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nombre}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Carrera & Tutor selectors (only for new students) */}
+            {formData.role === 'ALUMNO' && !user && (
+              <>
+                <div className="space-y-1 animate-slide-up">
+                  <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                    <FiShield size={12} />
+                    CARRERA DEL ESTUDIANTE
+                  </label>
+                  <select
+                    required
+                    value={selectedCarreraId}
+                    onChange={(e) => setSelectedCarreraId(e.target.value)}
+                    disabled={isCurrentUserTutor}
+                    className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)] disabled:opacity-75 disabled:cursor-not-allowed"
+                  >
+                    {carreras.map((c) => (
+                      <option key={c.id} value={c.id}>{c.nombre}</option>
+                    ))}
+                  </select>
+                  {isCurrentUserTutor && (
+                    <p className="text-[10px] text-[var(--text-muted)] italic">
+                      * Estás registrando un alumno en tu carrera asignada.
+                    </p>
+                  )}
+                </div>
+
+                {isCurrentUserAdmin && (
+                  <div className="space-y-1 animate-slide-up">
+                    <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                      <FiUser size={12} />
+                      TUTOR ASIGNADO
+                    </label>
+                    {filteredTutores.length > 0 ? (
+                      <select
+                        required
+                        value={selectedTutorId}
+                        onChange={(e) => setSelectedTutorId(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                      >
+                        {filteredTutores.map((t) => (
+                          <option key={t.uid} value={t.uid}>{t.nombre}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-medium flex items-center gap-2">
+                        <FiAlertCircle className="text-amber-600 shrink-0" size={14} />
+                        No hay tutores registrados en esta carrera. Primero registra o asigna un tutor a esta carrera.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
 
             {/* Password (only if new or explicitly changed) */}
@@ -164,11 +328,17 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
               <input
                 required={!user}
                 type="password"
+                minLength={6}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-medium"
-                placeholder={user ? 'Dejar en blanco para no cambiar' : 'Mínimo 8 caracteres'}
+                placeholder={user ? 'Dejar en blanco para no cambiar' : 'Mínimo 6 caracteres'}
               />
+              {!user && (
+                <p className="text-[10px] text-[var(--text-muted)] italic">
+                  * La contraseña debe tener al menos 6 caracteres.
+                </p>
+              )}
             </div>
           </div>
 

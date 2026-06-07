@@ -33,7 +33,7 @@ export default function TutorLayout({
         <RoleGuard resource="alert.view" action="read">
           <main
             id="main-content"
-            className="flex-1 overflow-y-auto p-8 animate-fade-in"
+            className="flex-1 overflow-y-auto p-4 md:p-8 animate-fade-in"
             aria-label="Contenido principal"
           >
             <div className="max-w-[1600px] mx-auto">

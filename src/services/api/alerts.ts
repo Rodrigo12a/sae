@@ -86,12 +86,8 @@ const MOCK_PRIORITY_ALERTS: PriorityAlertsResponse = {
  * @returns PriorityAlertsResponse con estado del Motor de IA incluido
  */
 export async function getPriorityAlerts(): Promise<PriorityAlertsResponse> {
-  // TODO: conectar a GET /alerts/priority cuando esté disponible en Swagger
-  // return api.get<PriorityAlertsResponse>('/alerts/priority').then(res => res.data);
-
-  // Mock temporal con datos de prueba realistas
-  await new Promise(resolve => setTimeout(resolve, 600)); // Simula latencia
-  return MOCK_PRIORITY_ALERTS;
+  const response = await api.get<PriorityAlertsResponse>('/alerts/priority');
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -106,18 +102,8 @@ export async function registerFollowUp(
   alertId: string,
   request: FollowUpRequest,
 ): Promise<FollowUpResponse> {
-  // TODO: conectar a POST /alerts/:id/followup cuando esté disponible en Swagger
-  // return api.post<FollowUpResponse>(`/alerts/${alertId}/followup`, request).then(res => res.data);
-
-  await new Promise(resolve => setTimeout(resolve, 400));
-  return {
-    id: `followup-${Date.now()}`,
-    alertId,
-    contenido: request.contenido,
-    registeredAt: new Date().toISOString(),
-    registeredBy: 'Tutor Demo',
-    newAlertStatus: 'en-seguimiento',
-  };
+  const response = await api.post<FollowUpResponse>(`/alerts/${alertId}/followup`, request);
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -132,14 +118,6 @@ export async function closeAlert(
   alertId: string,
   request: CloseAlertRequest,
 ): Promise<CloseAlertResponse> {
-  // TODO: conectar a PUT /alerts/:id/close cuando esté disponible en Swagger
-  // return api.put<CloseAlertResponse>(`/alerts/${alertId}/close`, request).then(res => res.data);
-
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return {
-    alertId,
-    newStatus: 'resuelta',
-    closedAt: new Date().toISOString(),
-    microSurveyScheduled: true,
-  };
+  const response = await api.put<CloseAlertResponse>(`/alerts/${alertId}/close`, request);
+  return response.data;
 }

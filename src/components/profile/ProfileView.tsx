@@ -55,7 +55,7 @@ export const ProfileView: React.FC = () => {
 
       {/* Profile Card */}
       <div className="relative -mt-32 px-6 sm:px-12">
-        <div className="bg-white rounded-[3rem] border border-[var(--border-subtle)] shadow-2xl shadow-black/5 overflow-hidden p-8 sm:p-12">
+        <div className="bg-white rounded-[3rem] border border-[var(--border-subtle)] shadow-2xl shadow-black/5 overflow-hidden p-6 sm:p-12">
           <div className="flex flex-col md:flex-row gap-10 items-center md:items-start text-center md:text-left">
             {/* Avatar Section */}
             <div className="relative group shrink-0">

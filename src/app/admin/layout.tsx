@@ -28,7 +28,7 @@ export default function AdminDashboardLayout({
         <Navbar />
 
         {/* Zona de Renderizado de Páginas */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-8 animate-fade-in">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 animate-fade-in">
           <div className="max-w-[1600px] mx-auto">
             {children}
           </div>

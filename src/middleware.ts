@@ -18,7 +18,21 @@ export default withAuth(
     // 1. Normalizar el rol para manejar alias (ej. teacher -> tutor)
     const normalizedRole = role ? ROLE_ALIAS_MAP[role] : null;
 
-    // 2. Verificar si la ruta actual requiere un rol específico según el mapa centralizado
+    // 2. Gestión del Consentimiento Obligatorio (HU001)
+    const needsConsent = token?.needsConsent === true;
+    
+    if (needsConsent && path !== "/auth/consent") {
+      console.info(`[SECURITY] User ${token?.uid} needs consent. Redirecting to /auth/consent.`);
+      return NextResponse.redirect(new URL("/auth/consent", req.url));
+    }
+
+    if (!needsConsent && path === "/auth/consent") {
+      // Si ya tiene consentimiento y está en la página de consentimiento, mandarlo a su dashboard
+      const destination = normalizedRole ? ROLE_ROUTE_MAP[normalizedRole]?.[0] || "/" : "/";
+      return NextResponse.redirect(new URL(destination, req.url));
+    }
+
+    // 3. Verificar si la ruta actual requiere un rol específico según el mapa centralizado
     for (const [routePrefix, allowedRoles] of Object.entries(ROLE_ROUTE_MAP)) {
       if (path.startsWith(routePrefix)) {
         // Validación: el rol normalizado del token debe estar en la lista permitida para el prefijo

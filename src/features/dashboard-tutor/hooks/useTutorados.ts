@@ -13,6 +13,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { userService } from '@/src/services/api/users';
 import type { User, CreateUserDto } from '@/src/services/api/users';
 import type { CreateTutoradoRequest, UpdateTutoradoRequest } from '@/src/types/tutorado';
+import { useSession } from 'next-auth/react';
+import { getAdminCarreras, getCarreraAlumnos } from '@/src/services/api/admin';
 
 interface UseTutoradosReturn {
   tutorados: User[];
@@ -31,6 +33,7 @@ interface UseTutoradosReturn {
  * @privacy Estado del formulario (password) vive en el componente — no en este hook.
  */
 export function useTutorados(): UseTutoradosReturn {
+  const { data: session } = useSession();
   const [tutorados, setTutorados] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,25 +41,26 @@ export function useTutorados(): UseTutoradosReturn {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const fetchTutorados = useCallback(async () => {
+    if (!session?.user?.id) return;
     setIsLoading(true);
     setError(null);
     try {
-      const data = await userService.getAll();
-      // El backend ya filtra por tutorados si el rol es DOCENTE
+      const data = await userService.getTutorados();
       setTutorados(data);
-    } catch {
+    } catch (err) {
+      console.error('Error fetching tutorados in hook:', err);
       setError('No se pudo cargar la lista de tutorados.');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     fetchTutorados();
   }, [fetchTutorados]);
 
   /** @returns true si exitoso, false si hubo error */
-  const handleCreate = async (data: CreateUserDto): Promise<boolean> => {
+  const handleCreate = async (data: CreateUserDto & { carreraId?: string; tutorId?: string }): Promise<boolean> => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
