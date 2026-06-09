@@ -23,25 +23,9 @@ import {
  * @privacy Devuelve únicamente datos agregados.
  */
 
-// TODO: conectar a GET /api/admin/kpis cuando esté disponible
 export const getAdminKPIs = async (filters?: KPIFilters): Promise<AdminKPIs> => {
   const response = await apiClient.get<AdminKPIs>('/admin/kpis', { params: filters });
-  
-  // Enriquecer con datos de prueba si no vienen del backend (Vibe Engineering)
-  const data = response.data;
-  if (data.alumnosSinEncuesta === undefined) {
-    data.alumnosSinEncuesta = 12;
-    data.estudiantesSinEncuesta = [
-      { id: '20230001', name: 'Juan Pérez García', career: 'Ingeniería en Sistemas' },
-      { id: '20230045', name: 'María Rodríguez Lopez', career: 'Ingeniería Industrial' },
-      { id: '20230122', name: 'Roberto Sánchez', career: 'Administración de Empresas' },
-      { id: '20230156', name: 'Ana Beltrán', career: 'Ingeniería en Sistemas' },
-      { id: '20230201', name: 'Carlos Slim Domit', career: 'Derecho' },
-      { id: '20230210', name: 'Diana Prince', career: 'Psicología' },
-    ];
-  }
-  
-  return data;
+  return response.data;
 };
 
 // TODO: conectar a GET /api/admin/groups/:id/drill-down cuando esté disponible

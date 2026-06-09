@@ -13,7 +13,7 @@ import { CareerRiskComparison } from '../../types';
 
 interface CareerRiskChartProps {
   data: CareerRiskComparison[];
-  activeCareers?: { id: string; nombre: string; materias: string[] }[];
+  activeCareers?: { id: string; nombre: string }[];
   onBarClick?: (careerId: string) => void;
 }
 
@@ -75,21 +75,7 @@ export const CareerRiskChart: React.FC<CareerRiskChartProps> = ({ data, activeCa
                         <span className="text-xs font-black" style={{ color: getRiskColor(Number(riskIndex)) }}>{riskIndex} pts</span>
                       </div>
 
-                      {careerData && careerData.materias && careerData.materias.length > 0 && (
-                        <div className="pt-2 border-t border-slate-50">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Materias Principales</p>
-                          <div className="flex flex-wrap gap-1">
-                            {careerData.materias.slice(0, 3).map((m, i) => (
-                              <span key={i} className="px-1.5 py-0.5 bg-slate-50 text-slate-500 rounded text-[9px] font-bold border border-slate-100">
-                                {m}
-                              </span>
-                            ))}
-                            {careerData.materias.length > 3 && (
-                              <span className="text-[9px] text-slate-400 font-bold ml-1">+{careerData.materias.length - 3} más</span>
-                            )}
-                          </div>
-                        </div>
-                      )}
+
                     </div>
                   );
                 }

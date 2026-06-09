@@ -199,7 +199,10 @@ function TutoradoListItem({
           <p className="text-sm font-bold text-gray-900 truncate">
             {tutorado.nombre}
           </p>
-          <p className="text-xs text-gray-500 font-medium">Matrícula: {tutorado.matricula || 'N/A'}</p>
+          <p className="text-xs text-gray-500 font-medium">
+            Matrícula: {tutorado.matricula || 'N/A'}
+            {(tutorado as any).semestre && ` • ${(tutorado as any).semestre}º Cuatrimestre`}
+          </p>
           <p className="text-[10px] text-gray-400 font-medium italic">Registrado el {new Date(tutorado.createdAt).toLocaleDateString()}</p>
         </div>
       </div>

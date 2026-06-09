@@ -46,12 +46,22 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
     password: '',
     role: lockRole || 'DOCENTE',
     matricula: '',
+    semestre: undefined,
+    grupo: '',
   });
 
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [tutores, setTutores] = useState<User[]>([]);
   const [selectedCarreraId, setSelectedCarreraId] = useState('');
   const [selectedTutorId, setSelectedTutorId] = useState('');
+
+  const selectedCarrera = carreras.find(c => c.id === selectedCarreraId);
+  const activeCuatrimestres = selectedCarrera?.cuatrimestres && selectedCarrera.cuatrimestres.length > 0
+    ? selectedCarrera.cuatrimestres
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const activeGrupos = selectedCarrera?.grupos && selectedCarrera.grupos.length > 0
+    ? selectedCarrera.grupos
+    : ['A', 'B', 'C', 'D', 'E', 'F'];
 
   useEffect(() => {
     if (user) {
@@ -61,6 +71,8 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
         role: user.role,
         matricula: user.matricula || '',
         password: '', // Password empty when editing
+        semestre: (user as any).semestre !== undefined ? (user as any).semestre : undefined,
+        grupo: (user as any).grupo || '',
       });
       setSelectedCarreraId((user as any).carreraId || '');
     } else {
@@ -70,6 +82,8 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
         password: '',
         role: lockRole || 'DOCENTE',
         matricula: '',
+        semestre: undefined,
+        grupo: '',
       });
       setSelectedCarreraId('');
     }
@@ -99,12 +113,17 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
             .catch(err => console.error('Error fetching tutors:', err));
         } else if (isCurrentUserTutor && currentUserId) {
           setSelectedTutorId(currentUserId);
-          // Fetch tutor's profile to retrieve their carreraId
+          // Fetch tutor's profile to retrieve their carreraId, semestre, and grupo
           userService.getById(currentUserId)
             .then((tutorProfile: any) => {
               if (tutorProfile?.carreraId) {
                 setSelectedCarreraId(tutorProfile.carreraId);
               }
+              setFormData(prev => ({
+                ...prev,
+                semestre: tutorProfile?.semestre !== undefined ? tutorProfile.semestre : prev.semestre,
+                grupo: tutorProfile?.grupo || prev.grupo,
+              }));
             })
             .catch(err => console.error('Error fetching tutor profile:', err));
         }
@@ -143,11 +162,22 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const payload: any = { ...formData };
-    if (formData.role === 'ALUMNO' && !user) {
-      payload.carreraId = selectedCarreraId;
-      payload.tutorId = isCurrentUserTutor ? currentUserId : selectedTutorId;
+    if (formData.role === 'ALUMNO') {
+      if (!user) {
+        payload.carreraId = selectedCarreraId;
+        payload.tutorId = isCurrentUserTutor ? currentUserId : selectedTutorId;
+      }
+      if (payload.semestre !== undefined && payload.semestre !== null) {
+        payload.semestre = parseInt(payload.semestre as any, 10);
+      }
     } else if (formData.role === 'DOCENTE') {
       payload.carreraId = selectedCarreraId || null;
+      if (payload.semestre !== undefined && payload.semestre !== null) {
+        payload.semestre = parseInt(payload.semestre as any, 10);
+      }
+      if (payload.grupo === '') {
+        payload.grupo = null;
+      }
     }
     await onSave(payload);
   };
@@ -244,25 +274,123 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSave, u
               </div>
             )}
 
-            {/* Carrera selector for Docente (Both creation and edit) */}
-            {formData.role === 'DOCENTE' && (
+            {/* Cuatrimestre (only if student) */}
+            {formData.role === 'ALUMNO' && (
               <div className="space-y-1 animate-slide-up">
                 <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
-                  <FiShield size={12} />
-                  CARRERA ASIGNADA AL TUTOR
+                  <FiHash size={12} />
+                  CUATRIMESTRE
                 </label>
                 <select
                   required
-                  value={selectedCarreraId}
-                  onChange={(e) => setSelectedCarreraId(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                  value={formData.semestre || ''}
+                  onChange={(e) => setFormData({ ...formData, semestre: e.target.value ? parseInt(e.target.value, 10) : undefined })}
+                  disabled={isCurrentUserTutor}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)] disabled:opacity-75 disabled:cursor-not-allowed"
                 >
-                  <option value="">-- Seleccionar Carrera --</option>
-                  {carreras.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nombre}</option>
+                  <option value="">-- Seleccionar Cuatrimestre --</option>
+                  {activeCuatrimestres.map((num) => (
+                    <option key={num} value={num}>
+                      {num}º Cuatrimestre
+                    </option>
                   ))}
                 </select>
               </div>
+            )}
+
+            {/* Grupo (only if student) */}
+            {formData.role === 'ALUMNO' && (
+              <div className="space-y-1 animate-slide-up">
+                <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                  <FiHash size={12} />
+                  GRUPO
+                </label>
+                <select
+                  required
+                  value={formData.grupo || ''}
+                  onChange={(e) => setFormData({ ...formData, grupo: e.target.value || '' })}
+                  disabled={isCurrentUserTutor}
+                  className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)] disabled:opacity-75 disabled:cursor-not-allowed"
+                >
+                  <option value="">-- Seleccionar Grupo --</option>
+                  {activeGrupos.map((letra) => (
+                    <option key={letra} value={letra}>
+                      Grupo {letra}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Carrera selector for Docente (Both creation and edit) */}
+            {formData.role === 'DOCENTE' && (
+              <>
+                <div className="space-y-1 animate-slide-up">
+                  <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                    <FiShield size={12} />
+                    CARRERA ASIGNADA AL TUTOR
+                  </label>
+                  <select
+                    required
+                    value={selectedCarreraId}
+                    onChange={(e) => {
+                      setSelectedCarreraId(e.target.value);
+                      // Clear selected cuatrimestre and group when career changes
+                      setFormData(prev => ({ ...prev, semestre: undefined, grupo: '' }));
+                    }}
+                    className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                  >
+                    <option value="">-- Seleccionar Carrera --</option>
+                    {carreras.map((c) => (
+                      <option key={c.id} value={c.id}>{c.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedCarreraId && (
+                  <>
+                    <div className="space-y-1 animate-slide-up">
+                      <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                        <FiHash size={12} />
+                        CUATRIMESTRE BAJO SEGUIMIENTO
+                      </label>
+                      <select
+                        required
+                        value={formData.semestre || ''}
+                        onChange={(e) => setFormData({ ...formData, semestre: e.target.value ? parseInt(e.target.value, 10) : undefined })}
+                        className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                      >
+                        <option value="">-- Seleccionar Cuatrimestre --</option>
+                        {activeCuatrimestres.map((num) => (
+                          <option key={num} value={num}>
+                            {num}º Cuatrimestre
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1 animate-slide-up">
+                      <label className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
+                        <FiHash size={12} />
+                        GRUPO BAJO SEGUIMIENTO
+                      </label>
+                      <select
+                        required
+                        value={formData.grupo || ''}
+                        onChange={(e) => setFormData({ ...formData, grupo: e.target.value || '' })}
+                        className="w-full px-4 py-2.5 bg-[var(--bg-section)] border border-[var(--border-subtle)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-secondary)]/20 focus:border-[var(--color-secondary)] outline-none transition-all font-bold text-[var(--text-primary)]"
+                      >
+                        <option value="">-- Seleccionar Grupo --</option>
+                        {activeGrupos.map((letra) => (
+                          <option key={letra} value={letra}>
+                            Grupo {letra}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
+              </>
             )}
 
             {/* Carrera & Tutor selectors (only for new students) */}

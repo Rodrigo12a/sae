@@ -94,14 +94,21 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, i
                       </span>
                       {(user as any).carreraNombre && (
                         <span className="text-[10px] text-gray-500 font-medium">
-                          Carrera: {(user as any).carreraNombre}
+                          Carrera: {(user as any).carreraNombre} {(user as any).semestre ? `(${(user as any).semestre}º Cuatrimestre)` : ''}
                         </span>
                       )}
                     </div>
                   ) : user.role === 'DOCENTE' ? (
-                    <span className="text-xs text-blue-700 font-bold">
-                      Carrera: {(user as any).carreraNombre || 'Sin carrera asignada'}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-blue-700 font-bold">
+                        Carrera: {(user as any).carreraNombre || 'Sin carrera asignada'}
+                      </span>
+                      {((user as any).semestre || (user as any).grupo) && (
+                        <span className="text-[10px] text-gray-500 font-medium">
+                          Seguimiento: {[(user as any).semestre ? `${(user as any).semestre}º Cuat.` : '', (user as any).grupo ? `Grupo ${(user as any).grupo}` : ''].filter(Boolean).join(' - ')}
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <span className="text-xs text-gray-400 italic">—</span>
                   )}

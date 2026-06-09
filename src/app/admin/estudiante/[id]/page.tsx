@@ -1,11 +1,10 @@
 /**
- * @module TutorStudentPage
- * @epic EPICA-2 Dashboard y Gestión de Alertas (Tutor)
- * @hu HU004, HU005, HU006
- * @ux UXDT-06 a UXDT-15
- * @qa QA-01 (privacidad diferencial) · QA-03 (sin datos clínicos en DOM)
+ * @module AdminStudentPage
+ * @epic EPICA-6 Panel Ejecutivo y Reportes
+ * @hu HU017
+ * @ux UXPA-01, UXPA-02
+ * @privacy Solo rol administrador — datos de salud filtrados por tipo y filterHealthByRole()
  * @api GET /students/:id/risk-profile · POST /alerts/:id/followup · PUT /alerts/:id/close
- * @privacy Solo rol tutor — datos de salud filtrados por tipo y filterHealthByRole()
  */
 
 'use client';
@@ -20,7 +19,7 @@ import { MedicalReferralModal } from '@/src/features/derivaciones/components/Med
 
 type ActiveModal = 'none' | 'followup' | 'close' | 'psychology' | 'medical';
 
-export default function TutorStudentPage() {
+export default function AdminStudentPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const studentId = params.id;
@@ -49,7 +48,7 @@ export default function TutorStudentPage() {
             </svg>
           </button>
           <h1 className="text-lg font-bold text-gray-900">
-            Perfil del estudiante
+            Perfil del estudiante (Administración)
           </h1>
         </div>
       </header>
@@ -77,7 +76,7 @@ export default function TutorStudentPage() {
         />
       </div>
 
-      {/* Modal de Seguimiento (HU005) */}
+      {/* Modal de Seguimiento */}
       {activeModal === 'followup' && (
         <ModalWrapper
           title="Registrar seguimiento"
@@ -92,7 +91,7 @@ export default function TutorStudentPage() {
         </ModalWrapper>
       )}
 
-      {/* Modal de Cierre (HU006) */}
+      {/* Modal de Cierre */}
       {activeModal === 'close' && (
         <ModalWrapper
           title="Cerrar alerta"
@@ -107,30 +106,26 @@ export default function TutorStudentPage() {
         </ModalWrapper>
       )}
 
-      {/* Modal de Derivación a Psicología (HU012) */}
+      {/* Modal de Derivación a Psicología */}
       <PsychologyReferralModal
         isOpen={activeModal === 'psychology'}
         onClose={() => setActiveModal('none')}
         studentId={studentId}
-        studentName="Estudiante" // TODO: obtener del perfil
+        studentName="Estudiante"
         activeAlertId={activeAlertId}
       />
 
-      {/* Modal de Derivación a Servicios Médicos (HU013) */}
+      {/* Modal de Derivación a Servicios Médicos */}
       <MedicalReferralModal
         isOpen={activeModal === 'medical'}
         onClose={() => setActiveModal('none')}
         studentId={studentId}
-        studentName="Estudiante" // TODO: obtener del perfil
+        studentName="Estudiante"
         alertId={activeAlertId}
       />
     </div>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Sub-componente: Wrapper de modal
-// ─────────────────────────────────────────────────────────────────────────────
 
 function ModalWrapper({
   title,

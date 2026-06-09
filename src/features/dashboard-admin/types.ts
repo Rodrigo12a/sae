@@ -18,7 +18,7 @@ export interface AdminKPIs {
   alumnosSinEncuesta: number;
   estudiantesSinEncuesta: { id: string; name: string; career: string }[];
   comparativaPorCarrera: CareerRiskComparison[];
-  carrerasActivas: { id: string; nombre: string; materias: string[] }[];
+  carrerasActivas: { id: string; nombre: string }[];
   dataFreshness: string;        // ISO timestamp — para badge de frescura
   latencyMs: number;            // Si > 300000ms (5min), badge de advertencia
 }

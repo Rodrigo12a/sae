@@ -15,6 +15,10 @@ export interface User {
   email?: string;
   role: UserRole;
   matricula?: string;
+  carreraId?: string;
+  carreraNombre?: string;
+  semestre?: number;
+  grupo?: string;
   createdAt: string;
 }
 
@@ -26,6 +30,8 @@ export interface CreateUserDto {
   matricula?: string;
   carreraId?: string;
   tutorId?: string;
+  semestre?: number;
+  grupo?: string;
 }
 
 export interface UpdateUserDto extends Partial<CreateUserDto> {}
@@ -52,6 +58,8 @@ export const userService = {
         role: 'ALUMNO' as UserRole,
         carreraId: user.carreraId,
         tutorId: user.tutorId,
+        semestre: user.semestre,
+        grupo: user.grupo,
       };
       const { data } = await api.post<User>('/users/alumno-completo', payload);
       return data;
@@ -66,9 +74,20 @@ export const userService = {
 
     if (user.role === 'ALUMNO') {
       payload.matricula = user.matricula?.trim();
+      if (user.semestre !== undefined) {
+        payload.semestre = user.semestre;
+      }
     } else {
       if (user.email) {
         payload.email = user.email.trim().toLowerCase();
+      }
+      if (user.role === 'DOCENTE') {
+        if (user.semestre !== undefined) {
+          payload.semestre = user.semestre;
+        }
+        if (user.grupo !== undefined) {
+          payload.grupo = user.grupo;
+        }
       }
     }
 
@@ -97,9 +116,12 @@ export const userService = {
 
     if (user.role === 'ALUMNO' || (!user.role && user.matricula)) {
       if (user.matricula) payload.matricula = user.matricula.trim();
+      if (user.semestre !== undefined) payload.semestre = user.semestre;
     } else {
       // Si el rol es staff o no se cambia pero se envía email
       if (user.email) payload.email = user.email.trim().toLowerCase();
+      if (user.semestre !== undefined) payload.semestre = user.semestre;
+      if (user.grupo !== undefined) payload.grupo = user.grupo;
     }
 
     if (user.carreraId !== undefined) {

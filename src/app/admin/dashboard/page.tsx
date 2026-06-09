@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdminKPIs } from '@/src/features/dashboard-admin/hooks/useAdminKPIs';
 import { KPIFilters } from '@/src/features/dashboard-admin/types';
 import { FilterPanel } from '@/src/features/dashboard-admin/components/FilterPanel';
@@ -16,6 +16,7 @@ import { useDashboardStore } from '@/src/features/dashboard-admin/store/dashboar
 import { CustomizeDashboardModal } from '@/src/features/dashboard-admin/components/CustomizeDashboardModal';
 import { FiAlertCircle, FiClock, FiRefreshCw, FiDownload, FiGrid, FiUsers, FiSettings, FiShield } from 'react-icons/fi';
 import { toast } from 'sonner';
+import { getInconsistencies } from '@/src/services/api/audit';
 
 /**
  * @module AdminDashboardPage
@@ -26,15 +27,31 @@ import { toast } from 'sonner';
  * @privacy ⚠️ Vista protegida por middleware. Renderiza ÚNICAMENTE datos agregados.
  */
 
-const inconsistenciasMock = [
-  { tutor: "Prof. Ramírez", casos: 3, estado: "Crítico",  badgeClass: "bg-red-100 text-red-700" },
-  { tutor: "Prof. López",   casos: 1, estado: "Revisión", badgeClass: "bg-amber-100 text-amber-700" },
-  { tutor: "Prof. Morales", casos: 1, estado: "Revisión", badgeClass: "bg-amber-100 text-amber-700" },
-];
-
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [filters, setFilters] = useState<KPIFilters>({});
+  const [inconsistencias, setInconsistencias] = useState<{ tutor: string; casos: number; estado: string; badgeClass: string }[]>([]);
+
+  useEffect(() => {
+    getInconsistencies().then(data => {
+      const grouped: Record<string, number> = {};
+      data.forEach(item => {
+        if (!item.isResolved) {
+          const tutor = item.tutorName || 'Desconocido';
+          grouped[tutor] = (grouped[tutor] || 0) + 1;
+        }
+      });
+      const formatted = Object.entries(grouped).map(([tutor, casos]) => {
+        const estado = casos >= 3 ? 'Crítico' : 'Revisión';
+        const badgeClass = casos >= 3 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+        return { tutor, casos, estado, badgeClass };
+      });
+      formatted.sort((a, b) => b.casos - a.casos);
+      setInconsistencias(formatted);
+    }).catch(err => {
+      console.error('Error fetching inconsistencies in dashboard:', err);
+    });
+  }, []);
   
   // Drill-down states
   const [drillDownCareer, setDrillDownCareer] = useState<string | null>(null);
@@ -62,11 +79,9 @@ export default function AdminDashboardPage() {
   };
 
   const handleNavigateToStudent = (studentId: string) => {
-    toast.success(`Navegando al perfil del estudiante: ${studentId}`);
-    // Opcionalmente podemos cerrar el drawer al navegar:
-    // setIsDrawerOpen(false);
-    // router.push(`/admin/estudiante/${studentId}`); 
-    // Nota: Dependiendo de los requerimientos de la ruta (HU017), tal vez el Admin no navega a una vista de tutor, sino a una de admin, por ahora mock con toast.
+    setIsDrawerOpen(false);
+    setIsSurveyDrawerOpen(false);
+    router.push(`/admin/estudiante/${studentId}`); 
   };
 
   // Funciones de formato de fechas
@@ -268,19 +283,27 @@ export default function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {inconsistenciasMock.map((row) => (
-                        <tr key={row.tutor} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="py-3.5 text-gray-700 font-medium">{row.tutor}</td>
-                          <td className="py-3.5 font-bold" style={{ color: row.casos >= 3 ? "var(--semaforo-rojo)" : "var(--text-secondary)" }}>
-                            {row.casos}
-                          </td>
-                          <td className="py-3.5">
-                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${row.badgeClass}`}>
-                              {row.estado}
-                            </span>
+                       {inconsistencias.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-gray-400 italic">
+                            No hay inconsistencias pendientes
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        inconsistencias.map((row) => (
+                          <tr key={row.tutor} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="py-3.5 text-gray-700 font-medium">{row.tutor}</td>
+                            <td className="py-3.5 font-bold" style={{ color: row.casos >= 3 ? "var(--semaforo-rojo)" : "var(--text-secondary)" }}>
+                              {row.casos}
+                            </td>
+                            <td className="py-3.5">
+                              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${row.badgeClass}`}>
+                                {row.estado}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -297,13 +320,13 @@ export default function AdminDashboardPage() {
             )}
           </div>
 
-          {/* Carreras y Materias Activas (New Requirement) */}
+          {/* Carreras Activas */}
           {isVisible('active-careers-list') && data.carrerasActivas && data.carrerasActivas.length > 0 && (
             <div className="bg-white border border-[var(--border-subtle)] rounded-2xl p-8 shadow-sm hover:shadow-md transition-all mt-6">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-[0.1em]">Programas Vigentes y Oferta Académica</h2>
-                  <p className="text-xs text-[var(--text-muted)] mt-1">Materias activas por cada programa académico registrado</p>
+                  <h2 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-[0.1em]">Programas Vigentes</h2>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">Listado de programas académicos activos registrados</p>
                 </div>
                 <div className="bg-indigo-50 px-3 py-1.5 rounded-lg text-indigo-600 text-[10px] font-black uppercase tracking-widest border border-indigo-100">
                   {data.carrerasActivas.length} Carreras Activas
@@ -313,25 +336,13 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {data.carrerasActivas.map((carrera) => (
                   <div key={carrera.id} className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 hover:border-indigo-200 hover:bg-white transition-all group">
-                    <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xs shadow-lg shadow-indigo-100">
                         {carrera.nombre.substring(0, 2).toUpperCase()}
                       </div>
                       <h3 className="font-bold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors leading-tight">
                         {carrera.nombre}
                       </h3>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-1.5">
-                      {carrera.materias && carrera.materias.length > 0 ? (
-                        carrera.materias.map((materia, idx) => (
-                          <span key={idx} className="bg-white border border-slate-200 text-slate-600 px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm">
-                            {materia}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-[10px] text-slate-400 italic">No hay materias registradas</span>
-                      )}
                     </div>
                   </div>
                 ))}

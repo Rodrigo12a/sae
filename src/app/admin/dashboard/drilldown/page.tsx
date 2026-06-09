@@ -14,14 +14,16 @@ import { SkeletonCard } from '@/src/components/ui/SkeletonCard';
 import { KPIFilters } from '@/src/features/dashboard-admin/types';
 import { FiLayers, FiAlertCircle } from 'react-icons/fi';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function DrilldownPage() {
+  const router = useRouter();
   const [filters, setFilters] = useState<KPIFilters>({});
 
   const { data, isLoading, isError, refetch } = useAdminKPIs(filters);
 
   const handleNavigateToStudent = (studentId: string) => {
-    toast.info(`Perfil del estudiante: ${studentId}`);
+    router.push(`/admin/estudiante/${studentId}`);
   };
 
   const careers = data?.comparativaPorCarrera ?? [];

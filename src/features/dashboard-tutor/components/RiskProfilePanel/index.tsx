@@ -226,13 +226,13 @@ function AcademicCharts({ history }: { history: AcademicHistory }) {
 interface RiskProfilePanelProps {
   studentId: string;
   /** Callback para cuando el tutor quiere registrar un seguimiento */
-  onFollowUp?: () => void;
+  onFollowUp?: (alertId: string) => void;
   /** Callback para cuando el tutor quiere cerrar la alerta */
-  onCloseAlert?: () => void;
+  onCloseAlert?: (alertId: string) => void;
   /** Callback para cuando el tutor quiere derivar a psicología */
-  onReferToPsychology?: () => void;
+  onReferToPsychology?: (alertId: string) => void;
   /** Callback para cuando el tutor quiere derivar a servicios médicos */
-  onReferToMedical?: () => void;
+  onReferToMedical?: (alertId: string) => void;
 }
 
 export function RiskProfilePanel({
@@ -268,6 +268,10 @@ export function RiskProfilePanel({
   // Solo habilitar derivación si hay alerta activa (roja o amarilla)
   const canRefer = profile.academico.semaforoEstado === 'rojo' || 
                    profile.academico.semaforoEstado === 'amarillo';
+
+  // Buscar el id de la alerta activa en el historial
+  const activeAlert = profile.alertHistory?.find(a => a.status !== 'resuelta');
+  const activeAlertId = activeAlert?.id || '';
 
   return (
     <div className="flex flex-col gap-5">
@@ -353,7 +357,7 @@ export function RiskProfilePanel({
         <div className="flex gap-3">
           {onFollowUp && (
             <button
-              onClick={onFollowUp}
+              onClick={() => onFollowUp(activeAlertId)}
               className="
                 flex-1 px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-xl
                 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
@@ -366,7 +370,7 @@ export function RiskProfilePanel({
           )}
           {onCloseAlert && (
             <button
-              onClick={onCloseAlert}
+              onClick={() => onCloseAlert(activeAlertId)}
               className="
                 flex-1 px-4 py-3 bg-green-600 text-white text-sm font-medium rounded-xl
                 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500
@@ -382,7 +386,7 @@ export function RiskProfilePanel({
         <div className="flex gap-3">
           {onReferToPsychology && (
             <button
-              onClick={onReferToPsychology}
+              onClick={() => onReferToPsychology(activeAlertId)}
               disabled={!canRefer}
               className={`
                 flex-1 px-4 py-3 text-sm font-medium rounded-xl
@@ -403,7 +407,7 @@ export function RiskProfilePanel({
 
           {onReferToMedical && (
             <button
-              onClick={onReferToMedical}
+              onClick={() => onReferToMedical(activeAlertId)}
               disabled={!canRefer}
               className={`
                 flex-1 px-4 py-3 text-sm font-medium rounded-xl

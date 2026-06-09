@@ -41,8 +41,8 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   },
   { 
     id: 'active-careers-list', 
-    title: 'Carreras y Materias Activas', 
-    description: 'Vista detallada de los programas académicos vigentes y sus materias.',
+    title: 'Carreras Activas', 
+    description: 'Vista detallada de los programas académicos vigentes.',
     visible: true 
   },
 ];

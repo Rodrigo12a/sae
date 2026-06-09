@@ -50,7 +50,12 @@ export default function CatalogoAlertasPage() {
     setModalMode('create');
     setEditingId(null);
     if (activeTab === 'carreras') {
-      setFormData({ nombre: '', activo: true });
+      setFormData({ 
+        nombre: '', 
+        activo: true, 
+        cuatrimestres: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 
+        grupos: ['A', 'B', 'C'] 
+      });
     } else {
       setFormData({ etiqueta: '', nivel: 'amarillo', descripcion: '', activo: true });
     }
@@ -96,9 +101,8 @@ export default function CatalogoAlertasPage() {
         const carreraData: CreateCarreraDto = {
           nombre: formData.nombre,
           activo: formData.activo,
-          materias: typeof formData.materias === 'string' 
-            ? formData.materias.split(',').map((m: string) => m.trim()).filter((m: string) => m !== '')
-            : formData.materias
+          cuatrimestres: formData.cuatrimestres || [],
+          grupos: formData.grupos || []
         };
         
         if (modalMode === 'create') {
@@ -364,128 +368,179 @@ export default function CatalogoAlertasPage() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-[2.5rem] w-full max-w-xl shadow-2xl overflow-hidden"
+              className="bg-white rounded-[2rem] w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
-              <div className="p-10">
-              <div className="flex justify-between items-center mb-10">
+              {/* Modal Header */}
+              <div className="p-6 md:p-8 pb-4 flex justify-between items-center border-b border-slate-100 shrink-0">
                 <div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
                     {modalMode === 'create' ? 'Agregar' : 'Editar'} {activeTab === 'carreras' ? 'Carrera' : 'Etiqueta'}
                   </h2>
-                  <p className="text-slate-400 font-medium mt-1">Completa los campos para actualizar el catálogo institucional.</p>
+                  <p className="text-slate-400 font-medium text-xs mt-1">Completa los campos para actualizar el catálogo institucional.</p>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400">
-                  <FiX size={32} />
+                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 cursor-pointer">
+                  <FiX size={24} />
                 </button>
               </div>
               
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {activeTab === 'carreras' ? (
-                  <>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nombre Oficial del Programa</label>
-                      <input 
-                        type="text" 
-                        required
-                        placeholder="Ej. Ingeniería en Inteligencia Artificial"
-                        className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all text-sm font-bold text-slate-700"
-                        value={formData.nombre || ''}
-                        onChange={e => setFormData((prev: any) => ({ ...prev, nombre: e.target.value }))}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Estatus Inicial</label>
-                      <select 
-                        className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-bold text-slate-700"
-                        value={formData.activo ? 'true' : 'false'}
-                        onChange={e => setFormData((prev: any) => ({ ...prev, activo: e.target.value === 'true' }))}
-                      >
-                        <option value="true">Activa y Visible</option>
-                        <option value="false">Inactiva (Oculta)</option>
-                      </select>
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Materias (separadas por coma)</label>
-                      <textarea 
-                        rows={3}
-                        placeholder="Ej. Cálculo I, Programación, Física..."
-                        className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-medium text-slate-600"
-                        value={Array.isArray(formData.materias) ? formData.materias.join(', ') : formData.materias || ''}
-                        onChange={e => setFormData((prev: any) => ({ ...prev, materias: e.target.value }))}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nombre de la Etiqueta</label>
-                      <input 
-                        type="text" 
-                        required
-                        placeholder="Ej. Riesgo Académico Leve"
-                        className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-bold text-slate-700"
-                        value={formData.etiqueta || ''}
-                        onChange={e => setFormData((prev: any) => ({ ...prev, etiqueta: e.target.value }))}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nivel de Gravedad (Semáforo)</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                        {['rojo', 'amarillo', 'verde', 'revisar', 'gris'].map((n) => (
-                          <button
-                            key={n}
-                            type="button"
-                            onClick={() => setFormData((prev: any) => ({ ...prev, nivel: n }))}
-                            className={`py-3 rounded-xl border-2 text-[8px] font-black uppercase tracking-widest transition-all ${
-                              formData.nivel === n 
-                                ? n === 'rojo' ? 'bg-red-50 border-red-500 text-red-600' :
-                                  n === 'amarillo' ? 'bg-amber-50 border-amber-500 text-amber-600' : 
-                                  n === 'verde' ? 'bg-emerald-50 border-emerald-500 text-emerald-600' :
-                                  n === 'revisar' ? 'bg-purple-50 border-purple-500 text-purple-600' :
-                                  'bg-slate-50 border-slate-500 text-slate-600'
-                                : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
-                            }`}
-                          >
-                            {n}
-                          </button>
-                        ))}
+              <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+                {/* Scrollable Form Body */}
+                <div className="p-8 pt-6 overflow-y-auto space-y-6 flex-1 min-h-0">
+                  {activeTab === 'carreras' ? (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nombre Oficial del Programa</label>
+                        <input 
+                          type="text" 
+                          required
+                          placeholder="Ej. Ingeniería en Inteligencia Artificial"
+                          className="w-full px-5 py-3.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all text-sm font-bold text-slate-700"
+                          value={formData.nombre || ''}
+                          onChange={e => setFormData((prev: any) => ({ ...prev, nombre: e.target.value }))}
+                        />
                       </div>
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Descripción de Apoyo</label>
-                      <textarea 
-                        rows={3}
-                        placeholder="Instrucciones para el tutor al ver esta etiqueta..."
-                        className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-medium text-slate-600"
-                        value={formData.descripcion || ''}
-                        onChange={e => setFormData((prev: any) => ({ ...prev, descripcion: e.target.value }))}
-                      />
-                    </div>
-                  </>
-                )}
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Estatus Inicial</label>
+                        <select 
+                          className="w-full px-5 py-3.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-bold text-slate-700"
+                          value={formData.activo ? 'true' : 'false'}
+                          onChange={e => setFormData((prev: any) => ({ ...prev, activo: e.target.value === 'true' }))}
+                        >
+                          <option value="true">Activa y Visible</option>
+                          <option value="false">Inactiva (Oculta)</option>
+                        </select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Cuatrimestres Activos</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => {
+                            const isActive = (formData.cuatrimestres || []).includes(num);
+                            return (
+                              <button
+                                key={num}
+                                type="button"
+                                onClick={() => {
+                                  const currentList = formData.cuatrimestres || [];
+                                  const newList = isActive
+                                    ? currentList.filter((n: number) => n !== num)
+                                    : [...currentList, num].sort((a, b) => a - b);
+                                  setFormData((prev: any) => ({ ...prev, cuatrimestres: newList }));
+                                }}
+                                className={`py-2 px-3 rounded-lg border text-xs font-bold transition-all text-center cursor-pointer ${
+                                  isActive
+                                    ? 'bg-indigo-50 border-indigo-500 text-indigo-600 font-extrabold shadow-sm'
+                                    : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                                }`}
+                              >
+                                {num}º Cuat.
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
 
-                <div className="pt-6 flex gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Grupos Activos (A a F)</label>
+                        <div className="flex flex-wrap gap-2">
+                          {['A', 'B', 'C', 'D', 'E', 'F'].map((letra) => {
+                            const isActive = (formData.grupos || []).includes(letra);
+                            return (
+                              <button
+                                key={letra}
+                                type="button"
+                                onClick={() => {
+                                  const currentList = formData.grupos || [];
+                                  const newList = isActive
+                                    ? currentList.filter((g: string) => g !== letra)
+                                    : [...currentList, letra].sort();
+                                  setFormData((prev: any) => ({ ...prev, grupos: newList }));
+                                }}
+                                className={`w-11 h-11 rounded-lg border text-sm font-bold flex items-center justify-center transition-all cursor-pointer ${
+                                  isActive
+                                    ? 'bg-indigo-50 border-indigo-500 text-indigo-600 font-extrabold shadow-sm'
+                                    : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                                }`}
+                              >
+                                {letra}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nombre de la Etiqueta</label>
+                        <input 
+                          type="text" 
+                          required
+                          placeholder="Ej. Riesgo Académico Leve"
+                          className="w-full px-5 py-3.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-bold text-slate-700"
+                          value={formData.etiqueta || ''}
+                          onChange={e => setFormData((prev: any) => ({ ...prev, etiqueta: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Nivel de Gravedad (Semáforo)</label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                          {['rojo', 'amarillo', 'verde', 'revisar', 'gris'].map((n) => (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => setFormData((prev: any) => ({ ...prev, nivel: n }))}
+                              className={`py-2 rounded-lg border-2 text-[8px] font-black uppercase tracking-widest transition-all ${
+                                formData.nivel === n 
+                                  ? n === 'rojo' ? 'bg-red-50 border-red-500 text-red-600' :
+                                    n === 'amarillo' ? 'bg-amber-50 border-amber-500 text-amber-600' : 
+                                    n === 'verde' ? 'bg-emerald-50 border-emerald-500 text-emerald-600' :
+                                    n === 'revisar' ? 'bg-purple-50 border-purple-500 text-purple-600' :
+                                    'bg-slate-50 border-slate-500 text-slate-600'
+                                  : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                              }`}
+                            >
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Descripción de Apoyo</label>
+                        <textarea 
+                          rows={3}
+                          placeholder="Instrucciones para el tutor al ver esta etiqueta..."
+                          className="w-full px-5 py-3.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-sm font-medium text-slate-600"
+                          value={formData.descripcion || ''}
+                          onChange={e => setFormData((prev: any) => ({ ...prev, descripcion: e.target.value }))}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-6 md:p-8 pt-4 border-t border-slate-100 flex gap-4 shrink-0 bg-slate-50/50">
                   <button 
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 py-4 text-slate-400 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+                    className="flex-1 py-3 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition-all cursor-pointer"
                   >
                     Descartar
                   </button>
                   <button 
                     type="submit"
                     disabled={isSaving}
-                    className="flex-1 py-4 bg-gray-900 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl shadow-slate-200 hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                    className="flex-1 py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {isSaving ? 'Sincronizando...' : 'Guardar Cambios'}
                   </button>
                 </div>
               </form>
-            </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
   </div>
 );
 }

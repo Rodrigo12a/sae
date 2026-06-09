@@ -17,8 +17,10 @@ import { KpiCard } from '@/src/components/ui/KpiCard';
 import { KPIFilters } from '@/src/features/dashboard-admin/types';
 import { FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function CarrerasPage() {
+  const router = useRouter();
   const [filters, setFilters] = useState<KPIFilters>({});
   const [drillDownCareer, setDrillDownCareer] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -35,7 +37,8 @@ export default function CarrerasPage() {
   };
 
   const handleNavigateToStudent = (studentId: string) => {
-    toast.info(`Estudiante: ${studentId}`);
+    setIsDrawerOpen(false);
+    router.push(`/admin/estudiante/${studentId}`);
   };
 
   return (

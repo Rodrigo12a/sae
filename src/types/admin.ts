@@ -8,7 +8,8 @@ export interface Carrera {
   id: string;
   nombre: string;
   activo: boolean;
-  materias?: string[];
+  cuatrimestres?: number[];
+  grupos?: string[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
@@ -17,7 +18,8 @@ export interface Carrera {
 export interface CreateCarreraDto {
   nombre: string;
   activo: boolean;
-  materias?: string[];
+  cuatrimestres?: number[];
+  grupos?: string[];
 }
 
 export interface UpdateCarreraDto extends Partial<CreateCarreraDto> {}
